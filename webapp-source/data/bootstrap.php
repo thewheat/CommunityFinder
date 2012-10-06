@@ -9,7 +9,7 @@ if ($_SERVER['HTTP_HOST'] == 'theveggiebox.org' || $_SERVER['HTTP_HOST'] == 'www
 	$SITE['DOMAIN'] = "www.theveggiebox.org";
 	$SITE['DB_HOST'] = 'localhost';
 	$SITE['DB_USERNAME'] = 'lukasber_tvb';
-	$SITE['DB_PW'] = 'tvb';
+	$SITE['DB_PW'] = '';
 	$SITE['DB_NAME'] = 'lukasber_agcdev';
 }
 else if ($_SERVER['HTTP_HOST'] == 'agrowingcommunity.org' || $_SERVER['HTTP_HOST'] == 'www.agrowingcommunity.org') {
@@ -18,7 +18,7 @@ else if ($_SERVER['HTTP_HOST'] == 'agrowingcommunity.org' || $_SERVER['HTTP_HOST
 	$SITE['DOMAIN'] = "www.agrowingcommunity.org";
 	$SITE['DB_HOST'] = 'localhost';
 	$SITE['DB_USERNAME'] = 'lukasber_tvb';
-	$SITE['DB_PW'] = 'tvb';
+	$SITE['DB_PW'] = '';
 	$SITE['DB_NAME'] = 'lukasber_agc';
 }
 else if ($_SERVER['HTTP_HOST'] == 'victoriamycommunity.org' || $_SERVER['HTTP_HOST'] == 'www.victoriamycommunity.org') {
@@ -27,7 +27,7 @@ else if ($_SERVER['HTTP_HOST'] == 'victoriamycommunity.org' || $_SERVER['HTTP_HO
 	$SITE['DOMAIN'] = "www.victoriamycommunity.org";
 	$SITE['DB_HOST'] = 'localhost';
 	$SITE['DB_USERNAME'] = 'lukasber_tvb';
-	$SITE['DB_PW'] = 'tvb';
+	$SITE['DB_PW'] = '';
 	$SITE['DB_NAME'] = 'lukasber_agc';
 }
 
