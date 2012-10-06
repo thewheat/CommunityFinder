@@ -1,0 +1,15 @@
+<markers>
+ <marker lat="43.83589" lng="-79.20040" name=" " description="yeah baby, info window 5"  label="Marker 5" type="transport" subtype="carpoolcarend" />
+ <marker lat="43.84589" lng="-80.10340" name=" " description="yeah baby, info window 6"  label="Marker 6" type="transport" subtype="carpoolcarstart" />
+ <marker lat="43.87589" lng="-80.10440" name=" " description="yeah baby, info window 7"  label="Marker 7" type="transport" subtype="carpoolcarend" />
+ <marker lat="43.65654" lng="-79.90138" name="Johns Veggie Patch" description="Some stuff to display in the First Info Window"  label="Marker One" type="food" subtype="veggiepatch" />
+ <marker lat="43.91892" lng="-78.89231" name="Peter" description="Some stuff to display in the Second Info Window" label="Marker Two" type="food" subtype="veggiepatch" />
+ <marker lat="43.82589" lng="-79.10040" name=" " description="Some stuff to display in the Third Info Window"  label="Marker Three" type="food" subtype="community garden" />
+ <marker lat="43.82589" lng="-80.10040" name=" " description="yeah baby, info window 4"  label="Marker Four" type="transport" subtype="carpoolcarstart" />
+ <marker lat="43.79589" lng="-80.20040" name="Culture Jam" description="yeah baby, info window 4"  label="Marker Four" type="community" subtype="event" />
+ <marker lat="43.80589" lng="-80.14040" name="Public Meeting" description="yeah baby, info window 4"  label="Marker Four" type="community" subtype="event" />
+ <marker lat="43.80589" lng="-80.3040" name="Friends of the Earth" description="Meeting space, bookshop, food co-op"  label="Marker Four" type="community" subtype="office" />
+ </markers>
+
+ 
+

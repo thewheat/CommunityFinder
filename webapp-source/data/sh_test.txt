@@ -1,0 +1,37 @@
+
+
+other stuff in the page
+
+bal bla bla bla
+
+
+				<lat>-37.805699</lat><lng>145.005511</lng>
+				<lat>-37.818699</lat><lng>145.011511</lng>
+				<lat>-37.858699</lat><lng>145.022511</lng>
+	a			<lat>-37.805699</lat><lng>145.033511</lng>   ddd
+  	dd		<lat>-37.818699</lat><lng>145.044511</lng>
+		d		<lat>-37.856699</lat><lng>145.055511</lng>  d
+	a			<lat>-37.805699</lat><lng>145.066511</lng>
+
+	a			<lat>-37.805699</lat><lng>145.066511</lng>
+	a			<lat>-37.805699</lat><lng>145.066511</lng>
+	a			<lat>-37.805699</lat><lng>145.066511</lng>
+	a			<lat>-37.805699</lat><lng>145.066511</lng>
+	a			<lat>-37.805699</lat><lng>145.066511</lng>
+	a			<lat>-37.805699</lat><lng>145.066511</lng>
+	a			<lat>-37.816699</lat><lng>145.077511</lng>
+				<lat>-37.858699</lat><lng>145.088511</lng>   dd
+dfd			<lat>-37.806699</lat><lng>145.099511</lng>
+	a			<lat>-37.818699</lat><lng>145.001511</lng>
+	a			<lat>-37.858699</lat><lng>145.062511</lng>
+	dddd	<lat>-37.805679</lat><lng>145.063511</lng>
+			
+	
+	adfad
+	ad
+	fa
+	df
+	ad
+	fads
+	fa
+	f

@@ -1,0 +1,14 @@
+<icons>
+  <icon display_name="Community Space" subtype="community space" type="community" image="images/community_space.png" />
+  <icon display_name="Community Event" subtype="event" type="community" image="images/community_event.png" />
+  <icon display_name="Map Note" subtype="note" type="community" image="images/note.png" /> 
+  <icon display_name="Veggie Patch" subtype="veggie patch" type="food" image="images/veggie_patch.png" />
+  <icon display_name="Empty Lot" subtype="empty lot" type="food" image="images/empty_lot.png" />
+  <icon display_name="Community Garden" subtype="community garden" type="food" image="images/community_garden.png" />
+  <icon display_name="Food Co-op" subtype="food co-op" type="food" image="images/seedling.png" />
+  <icon display_name="Freecycle Gift" subtype="freecycle" type="resource" image="images/freecycle.png" />
+  <icon display_name="Op Shop" subtype="op shop" type="resource" image="images/op_shop.png" />
+  <icon display_name="Bike Facility" subtype="bike facility" type="resource" image="images/bike.png" />
+  <icon display_name="Tool Shed" subtype="tool shed" type="resource" image="images/marker-house.png" />
+  <icon display_name="Sharehood Member" subtype="sharehood" type="community" image="images/sharehood.png" />
+</icons>

@@ -1,0 +1,27 @@
+<?php
+session_start();
+
+// returns all markers in database formated as xml document
+
+print('user_id - ' . $_SESSION['user']['user_id'] . '<br> ');
+print('user_email - ' . $_SESSION['user']['email'] . '<br> ');
+print('first_name - ' . $_SESSION['user']['first_name'] . '<br> ');
+print('last_name - ' . $_SESSION['user']['last_name'] . '<br> ');
+
+
+
+//print('<markers>' . "\n");
+//while ($row = mysql_fetch_assoc($result)) {
+    
+//	print('  <marker lat="' . $row["lat"]
+//		. '" lng="' . $row["lng"]
+//		. '" name="' . $row["name"]
+//		. '" description="' . $row["description"]
+//		. '" label="' . $row["name"]
+//		. '" type="' . $row["type"]
+//		. '" subtype="' . $row["subtype"]
+//		. '"/>' . "\n");
+//}
+//print('</markers>' . "\n");
+//
+?>
