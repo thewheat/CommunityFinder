@@ -19,5 +19,3 @@ This is a working bee to create a mobile 'app' of the site, we're planning a mul
 So, people with JavaScript and mobile development experience are more than welcome, as are those with PHP, responsive design skills, iOS design skills, Android design skills. Testers, UX experts and those with general interest in mapping are also more than welcome to lend their expertise.
 
 So join us in helping help many organisations and individuals who are keen to grow their communities.
-
-Food and drink will be supplied, venue to be confirmed when we have an idea of numbers.
