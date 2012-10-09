@@ -30,5 +30,14 @@ else if ($_SERVER['HTTP_HOST'] == 'victoriamycommunity.org' || $_SERVER['HTTP_HO
 	$SITE['DB_PW'] = '';
 	$SITE['DB_NAME'] = 'lukasber_agc';
 }
-
+else{
+	$SITE = array();
+	$SITE['GOOGLE_KEY'] = "";
+	$SITE['DOMAIN'] = "localhost/communityfinder";
+	$SITE['DB_HOST'] = 'localhost';
+	$SITE['DB_USERNAME'] = 'user';
+	$SITE['DB_PW'] = '';
+	$SITE['DB_NAME'] = 'communityfinder';
+	error_reporting(E_ERROR | E_WARNING | E_PARSE);
+}
 ?>

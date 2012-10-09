@@ -52,7 +52,7 @@ div#header_center {
 		margin: 0px auto;
 		text-align: left; /*ie5 center trick*/
 		margin-top: 0px;
-		background-image: url('/images/header_background.png');
+		background-image: url('../images/header_background.png');
 		background-repeat: no-repeat;
 		background-position: bottom left;
 		//border: 1px solid transparent;
@@ -66,7 +66,7 @@ div#header_login_large { float: right;}
 #panel_background {
 	z-index: 2000; 
 	background: white; 
-	background-image: url(/images/front_bg.gif);
+	background-image: url('../images/front_bg.gif');
 	background-repeat: no-repeat;
 	background-attachment: scroll;
 	background-position: right bottom;

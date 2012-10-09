@@ -7,20 +7,19 @@ require_once('./data/bootstrap.php');require_once('./data/functions.php'); ?><!D
 			printMetaData();
 			
 			$theme = 'default';
-			print('<link type="text/css" href="/css/themes/' . $theme . '/jquery-ui-1.7.custom.css" rel="Stylesheet" />');		
-			print('<link type="text/css" href="/css/themes/' . $theme . '/theme_tweaks.css" rel="Stylesheet" />');		
+			print('<link type="text/css" href="css/themes/' . $theme . '/jquery-ui-1.7.custom.css" rel="Stylesheet" />');		
 		?>
 					
-		<link href="./css/base.css" rel="stylesheet" type="text/css">
-		<link href="./css/jquery.clearableTextField.css" rel="stylesheet" type="text/css">
+		<link href="css/base.css" rel="stylesheet" type="text/css">
+		<link href="css/jquery.clearableTextField.css" rel="stylesheet" type="text/css">
 		
-		<script type="text/javascript" src="/javascript/jquery.js"></script>
-		<script type="text/javascript" src="/javascript/jquery.jfeed.js"></script>
-		<script type="text/javascript" src="/javascript/ticker-0.1.js"></script>
-		<script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
-		<script type="text/javascript" src="/javascript/jquery-ui-1.7.2.custom.js"></script>
-		<script type='text/javascript' src="/javascript/ui.autocomplete.js"></script> 
-		<script type='text/javascript' src="/javascript/jquery.clearableTextField.js"></script> 
+		<script type="text/javascript" src="javascript/jquery.js"></script>
+		<script type="text/javascript" src="javascript/jquery.jfeed.js"></script>
+		<script type="text/javascript" src="javascript/ticker-0.1.js"></script>
+		<script type="text/javascript" src="javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
+		<script type="text/javascript" src="javascript/jquery-ui-1.7.2.custom.js"></script>
+		<script type='text/javascript' src="javascript/ui.autocomplete.js"></script> 
+		<script type='text/javascript' src="javascript/jquery.clearableTextField.js"></script> 
 
 		<?php	
 			print('<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=' . $SITE['GOOGLE_KEY'] . '" type="text/javascript"></script>' . "\n");
@@ -166,7 +165,7 @@ require_once('./data/bootstrap.php');require_once('./data/functions.php'); ?><!D
 				<div style="float: right; clear: both; width: 250px; margin: 0.4em 0 0.4em 0.6em; padding: 0.4em 0.4em 0.4em 0.8em" class="ui-corner-all ui-widget-content"><b>Become a Contributor:</b><br>Join the network to contribute information about your community... <br/> <button type="button" class="loginButton fg-button ui-corner-all ui-state-default" style="float: right; margin: 0.6em">Sign Up</button></div>
 
 				<div style="float: right; clear: both; width: 250px; margin: 0.4em 0 0.4em 0.6em; padding: 0.4em 0.4em 0.4em 0.8em" class="ui-corner-all ui-widget-content"><b>Watch the Video</b><br/>To learn how the site works...
-				<a target="_blank" href="http://www.youtube.com/watch?v=mqhUG63pwAE"><img style="margin: 5px 18px;" src="/images/youtube.png" title="watch on youtube"/></a>
+				<a target="_blank" href="http://www.youtube.com/watch?v=mqhUG63pwAE"><img style="margin: 5px 18px;" src="images/youtube.png" title="watch on youtube"/></a>
 				</div>
 				<p style="font-size: 1.2em;">VictoriaMyCommunity.org lets you add, find, connect with community resources, services and groups in the area around you. The network is a community built and run resource that supports more resilient, sustainable communities. <a href="javascript: application.panelManager.openDocsWindow();">Learn more...</a><br><br> </p> 	
 				<div class="" style="padding: 0.4em; margin-right: 2em; width: 60%;" >
@@ -294,10 +293,10 @@ require_once('./data/bootstrap.php');require_once('./data/functions.php'); ?><!D
 			<div id="panel_docs" class="content_pane">
 				<div id="tabs_doco">
 					<ul>
-						 <li><a href="/docs/index.html"><span>Welcome</span></a></li>
-						 <li><a href="/docs/help.html"><span>Instructions / Help</span></a></li>
-						 <li><a href="/docs/planned_features.html"><span>Future Development</span></a></li>
-						 <li><a href="/docs/about_us.html"><span>Contact / About Us</span></a></li>
+						 <li><a href="docs/index.html"><span>Welcome</span></a></li>
+						 <li><a href="docs/help.html"><span>Instructions / Help</span></a></li>
+						 <li><a href="docs/planned_features.html"><span>Future Development</span></a></li>
+						 <li><a href="docs/about_us.html"><span>Contact / About Us</span></a></li>
 					</ul>
 				</div>
 			</div>
@@ -341,9 +340,9 @@ require_once('./data/bootstrap.php');require_once('./data/functions.php'); ?><!D
 								<p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: 0.3em;"></span>
 										The links below provide feeds of all listings matching your current search within the current area.</p>
 								<p>
-									<a id="listings_feed_xml" target="_blank" href=""><img src="/images/link_xml.jpg" /></a> &nbsp; &nbsp;
-									<a id="listings_feed_kml" target="_blank" href=""><img src="/images/link_kml.jpg" /></a> &nbsp;
-									<a id="listings_feed_csv" target="_blank" href=""><img src="/images/link_csv.jpg" /></a> &nbsp;
+									<a id="listings_feed_xml" target="_blank" href=""><img src="images/link_xml.jpg" /></a> &nbsp; &nbsp;
+									<a id="listings_feed_kml" target="_blank" href=""><img src="images/link_kml.jpg" /></a> &nbsp;
+									<a id="listings_feed_csv" target="_blank" href=""><img src="images/link_csv.jpg" /></a> &nbsp;
 								</p>
 								<p><b>Note:</b> If new listings are added that match your current search, they will also appear in these feeds.</p>
 							</div>

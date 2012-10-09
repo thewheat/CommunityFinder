@@ -54,8 +54,8 @@ GMarker.prototype.openInformationWindow = function(openTab) {
 		if (this.rss != undefined && this.rss != '') {
 				text += '<hr/>';
 				text += '<b>Latest News from : </b><a id="listing_site_preview" " target="_blank" href="' + this.www + '">' + this.www + '</a>';
-				text += '<div id="latest_news" style="height: 60px; overflow:hidden; text-align: center; padding-top:10px;">&nbsp;<br/><img src="./images/wait_small.gif"/> &nbsp; <b>Loading...</b><br><br>&nbsp;<br/></div>';
-				text += '<img style="margin-bottom: -4px;" src="/images/rss.gif" />  <a target="_blank" href="' + this.rss + '" title="">Copy this link to save RSS Feed</a>';		
+				text += '<div id="latest_news" style="height: 60px; overflow:hidden; text-align: center; padding-top:10px;">&nbsp;<br/><img src="images/wait_small.gif"/> &nbsp; <b>Loading...</b><br><br>&nbsp;<br/></div>';
+				text += '<img style="margin-bottom: -4px;" src="images/rss.gif" />  <a target="_blank" href="' + this.rss + '" title="">Copy this link to save RSS Feed</a>';		
 		}
 		else {
 				text += '<hr/>';									
@@ -64,23 +64,23 @@ GMarker.prototype.openInformationWindow = function(openTab) {
 	}
 	else if(this.rss != undefined && this.rss != '') {
 		text += '<b>Latest News : </b><br/>';
-		text += '<div style="margin-left: 60px; margin-top: 0px">&nbsp;<br/><img src="./images/wait_small.gif"/> &nbsp; <b>Loading...</b><br/></div>';
-		text += '<img style="margin-bottom: -4px;" src="/images/rss.gif" />  <a target="_blank" href="' + this.rss + '" title="">Copy this link to save RSS Feed</a>';		
+		text += '<div style="margin-left: 60px; margin-top: 0px">&nbsp;<br/><img src="images/wait_small.gif"/> &nbsp; <b>Loading...</b><br/></div>';
+		text += '<img style="margin-bottom: -4px;" src="images/rss.gif" />  <a target="_blank" href="' + this.rss + '" title="">Copy this link to save RSS Feed</a>';		
 	}							
 	if(this.invite_email) {
-			text += '<hr/><img style="margin-bottom: -4px;" src="/images/listing_contact.jpg"/> <a href=""# onclick="application.user.refreshConversationNew(\'' + this.invite_email + '\', \'email\'); application.panelManager.openInboxWindow(); return(false);">Contact</a> ';
+			text += '<hr/><img style="margin-bottom: -4px;" src="images/listing_contact.jpg"/> <a href=""# onclick="application.user.refreshConversationNew(\'' + this.invite_email + '\', \'email\'); application.panelManager.openInboxWindow(); return(false);">Contact</a> ';
 	}
 	else if(this.invite_url) {
-		text += '<hr/><img style="margin-bottom: -4px;" src="/images/listing_contact.jpg"/> <a target="_blank" href="' + this.invite_url + '">Contact</a> ';
+		text += '<hr/><img style="margin-bottom: -4px;" src="images/listing_contact.jpg"/> <a target="_blank" href="' + this.invite_url + '">Contact</a> ';
 	}	
 	else if(this.invite_text) {
-			text += '<hr/><img style="margin-bottom: -4px;" src="/images/listing_contact.jpg"/> <a href="#" onclick="application.user.refreshConversationNew(\'' + this.invite_text + '\', \'text\'); return(false);">Contact</a> ';
+			text += '<hr/><img style="margin-bottom: -4px;" src="images/listing_contact.jpg"/> <a href="#" onclick="application.user.refreshConversationNew(\'' + this.invite_text + '\', \'text\'); return(false);">Contact</a> ';
 	}
 	else {
-			text += '<hr/><img style="margin-bottom: -4px;" src="/images/listing_contact.jpg"/> <a href="#" onclick="application.user.refreshConversationNew(\'' + this.username + '\', \'username\'); return(false);">Contact</a> ';
+			text += '<hr/><img style="margin-bottom: -4px;" src="images/listing_contact.jpg"/> <a href="#" onclick="application.user.refreshConversationNew(\'' + this.username + '\', \'username\'); return(false);">Contact</a> ';
 	}
-	text += '| <img style="margin-bottom: -4px;" src="/images/twitter_share.png" /> <a target="_blank" href="http://twitter.com/home?status=Just found ' + this.name + '. http://victoriamycommunity.org/index.php?lid=' + this.lid + '">Tweet It</a> ';
-	text += '| <img style="margin-bottom: -4px;" src="/images/facebook_share.gif" /> <a target="_blank" href="http://www.facebook.com/sharer.php?u=http://victoriamycommunity.org/index.php?lid=' + this.lid + '">Share on Facebook</a> ';
+	text += '| <img style="margin-bottom: -4px;" src="images/twitter_share.png" /> <a target="_blank" href="http://twitter.com/home?status=Just found ' + this.name + '. http://victoriamycommunity.org/index.php?lid=' + this.lid + '">Tweet It</a> ';
+	text += '| <img style="margin-bottom: -4px;" src="images/facebook_share.gif" /> <a target="_blank" href="http://www.facebook.com/sharer.php?u=http://victoriamycommunity.org/index.php?lid=' + this.lid + '">Share on Facebook</a> ';
 	text += '<br/>';	
 	text += '</div>';
 
@@ -122,13 +122,13 @@ GMarker.prototype.openInformationWindow = function(openTab) {
 	var width = '600';
 
 	var text_share = '<div class="info_window" style="height: 130px; overflow:hide;">'; 
-	text_share += '<p><img style="margin-bottom: -4px;" src="/images/twitter_share.png" /> <a target="_blank" href="http://twitter.com/home?status=Just found ' + this.name + '. http://victoriacommunity.org/index.php?lid=' + this.lid + '">Tweet about it on Twitter</a></p>';
-	text_share += '<p><img style="margin-bottom: -4px;" src="/images/facebook_share.gif" /> <a target="_blank" href="http://www.facebook.com/sharer.php?u=http://victoriamycommunity.org/index.php?lid=' + this.lid + '">Share it on Facebook</a></p>';
-	text_share += '<p><img style="margin-bottom: -4px;" src="/images/link_share.jpg" /> <a href="#" onclick="$(\'#link_code\').toggle(\'normal\');$(\'#embed_code\').hide(\'slow\'); return(false);">Email / Link to this Listing</a></p>';	
+	text_share += '<p><img style="margin-bottom: -4px;" src="images/twitter_share.png" /> <a target="_blank" href="http://twitter.com/home?status=Just found ' + this.name + '. http://victoriacommunity.org/index.php?lid=' + this.lid + '">Tweet about it on Twitter</a></p>';
+	text_share += '<p><img style="margin-bottom: -4px;" src="images/facebook_share.gif" /> <a target="_blank" href="http://www.facebook.com/sharer.php?u=http://victoriamycommunity.org/index.php?lid=' + this.lid + '">Share it on Facebook</a></p>';
+	text_share += '<p><img style="margin-bottom: -4px;" src="images/link_share.jpg" /> <a href="#" onclick="$(\'#link_code\').toggle(\'normal\');$(\'#embed_code\').hide(\'slow\'); return(false);">Email / Link to this Listing</a></p>';	
 	text_share += '<p id="link_code" style="display:none;">Cut and Paste the following code to link to this linsting: <br/>';
 	text_share += '<input type="text" style="width: 280px;" value="http://www.victoriamycommunity.org/index.php?zoom=' + map.getZoom() + '&lat=' + lat_lng.lat() + '&lng=' + lat_lng.lng() + '&lid=' + this.lid + '" /></p>';		 
 
-	text_share += '<p><img style="margin-bottom: -4px;" src="/images/embed_share.jpg" /> <a href="#" onclick="$(\'#embed_code\').toggle(\'normal\');$(\'#link_code\').hide(\'slow\'); return(false);">Embed this Listing / Map into your website</a></p>';	
+	text_share += '<p><img style="margin-bottom: -4px;" src="images/embed_share.jpg" /> <a href="#" onclick="$(\'#embed_code\').toggle(\'normal\');$(\'#link_code\').hide(\'slow\'); return(false);">Embed this Listing / Map into your website</a></p>';	
 	text_share += '<p id="embed_code" style="display:none;">Cut and Paste the following code to embed this linsting: <br/>';
 	text_share += '<input type="text" style="width: 280px;" value="<iframe src=&quot;http://www.victoriamycommunity.org/index.php?zoom=' + map.getZoom() + '&lat=' + lat_lng.lat() + '&lng=' 
 		+ lat_lng.lng() + '&lid=' + this.lid + '&quot; style=&quot;width: ' + width + 'px; height:' + height + 'px; border:none;&quot;></iframe>" /></p>';		 
@@ -293,14 +293,14 @@ GMarker.prototype.openInformationWindow = function(openTab) {
 	}
 	setTimeout('fixButtons()', 2000);
 
-	setTimeout('$("#wiki").autocomplete({url: "/data/autocomplete_wikipedia.php", multiple: false, mustMatch:true})', 2000);
+	setTimeout('$("#wiki").autocomplete({url: "data/autocomplete_wikipedia.php", multiple: false, mustMatch:true})', 2000);
 	
-	setTimeout('$("#tags_general").autocomplete({url: "/data/autocomplete_tags.php", multiple: true,multipleSeparator: ",",extraParams: { prefix: "" }})', 2000);
+	setTimeout('$("#tags_general").autocomplete({url: "data/autocomplete_tags.php", multiple: true,multipleSeparator: ",",extraParams: { prefix: "" }})', 2000);
 	setTimeout('$("#tags_general").keyup(function(e) { if(e.keyCode == 188) { return(false);}});', 3000);
 	for(var i in application.resourceManager.marker_types[this.subtype].prefixes) {
 			var prefix = application.resourceManager.marker_types[this.subtype].prefixes[i];
 			prefix_ref = prefix.replace(/\s/g, '_'); // underscore all spaces
-			setTimeout('$("#tags_' + prefix_ref+ '").autocomplete({url: "/data/autocomplete_tags.php", multiple: true,multipleSeparator: ",",extraParams: { prefix: "' + prefix + '" }})', 2000);
+			setTimeout('$("#tags_' + prefix_ref+ '").autocomplete({url: "data/autocomplete_tags.php", multiple: true,multipleSeparator: ",",extraParams: { prefix: "' + prefix + '" }})', 2000);
 	}
 	
 	that.loadComments();
@@ -310,14 +310,14 @@ GMarker.prototype.addToDB = function(doOnComplete) {
 	var lat_lng = this.getLatLng()
 	var that = this;
 	
-	var url = "/data/add_resource.php?";
+	var url = "data/add_resource.php?";
 	url += 'title=' + this.name + '&';
 	url += 'description=' + this.desc + '&';
 	url += 'type=' + this.type + '&';
 	url += 'subtype=' + this.subtype + '&';
 	url += 'lat=' + lat_lng.lat() + '&';
 	url += 'lng=' + lat_lng.lng();
-	$.post('/data/add_resource.php', {title: this.name, desc: this.desc, type:this.type, subtype:this.subtype, lat:lat_lng.lat(), lng:lat_lng.lng()}, function(data) { 
+	$.post('data/add_resource.php', {title: this.name, desc: this.desc, type:this.type, subtype:this.subtype, lat:lat_lng.lat(), lng:lat_lng.lng()}, function(data) { 
 		if($(data).find("response_state").attr("success") == 'true') {
 			//doOnComplete(data);
 			that.lid = $(data).find("marker").attr("lid");
@@ -327,7 +327,7 @@ GMarker.prototype.addToDB = function(doOnComplete) {
 }
 GMarker.prototype.deleteToDB = function() {
 	var that = this;
-	$.post('/data/delete_resource.php', {lid: this.lid}, function() {
+	$.post('data/delete_resource.php', {lid: this.lid}, function() {
 		map.removeOverlay(that);
 		application.resourceManager.markers[that.lid].deleted = true;//TODO fix this
 	});
@@ -391,7 +391,7 @@ GMarker.prototype.updateToDB = function(form) {
 			else { alltags += ',' + prefix.replace(/_/g, ' ') + ':' + this.tags[prefix][i];}
 		}
 	}
-	$.post('/data/update_resource.php', {lid:this.lid, title:this.name, desc:this.desc, type:this.type, 
+	$.post('data/update_resource.php', {lid:this.lid, title:this.name, desc:this.desc, type:this.type, 
 	subtype:this.subtype, lat:lat_lng.lat(), lng:lat_lng.lng(), www:this.www, wiki:this.wiki, rss:this.rss, is_invite:this.is_invite, invite_email:this.invite_email, invite_url:this.invite_url, address:this.address, phone:this.phone, tags:alltags});
 
 			
@@ -401,7 +401,7 @@ GMarker.prototype.updateToDB = function(form) {
 GMarker.prototype.addCommentToDB = function(form) {
 	var that = this;
 	var comment_text = form.elements['comment'].value;
-	$.post('/data/add_listing_comment.php', {lid:this.lid, comment_text:comment_text});
+	$.post('data/add_listing_comment.php', {lid:this.lid, comment_text:comment_text});
 			
 	//reset search so is matches added marker
 	that.loadComments();
@@ -416,7 +416,7 @@ GMarker.prototype.reportCommentToDB = function(form) {
 GMarker.prototype.loadComments = function() {
 	var that = this;
 	$("#listing_comments_results").html("");
-	$.get('/data/get_marker_comments.php', {lid: that.lid}, function(data) {	
+	$.get('data/get_marker_comments.php', {lid: that.lid}, function(data) {	
 		var flag = 0;
 		$(data).find('comment').each(function(i) {
 			flag = 1;
@@ -476,7 +476,7 @@ function ResourceManager(map) {
 		this.cluster = new ClusterMarker(map, {intersectPadding: -6, clusterMarkerIcon: cluster_icon});
 		//this.cluster.clusterMarkerClick=function() { that.cluster.fitMapMaxZoom(1) };
 		
-		$.get('/data/get_subtypes.php', {restrict_subtype: that.restrict_subtype}, function(data) {
+		$.get('data/get_subtypes.php', {restrict_subtype: that.restrict_subtype}, function(data) {
 			var type_heading = '';
 			$(data).find('icon').each(function(i) {	
 				var subtype = $(this).attr('subtype');
@@ -731,7 +731,7 @@ function ResourceManager(map) {
 			var west_lng = SouthWest.lng();	
 		}
 		
-		$.getJSON('/data/get_markers.php', {format:"json",north_lat:north_lat, east_lng:east_lng, south_lat:south_lat, west_lng:west_lng, filter_text: filter_text, filter_subtype: filter_subtype, username:username, listing_id: lid}, function(data) {	
+		$.getJSON('data/get_markers.php', {format:"json",north_lat:north_lat, east_lng:east_lng, south_lat:south_lat, west_lng:west_lng, filter_text: filter_text, filter_subtype: filter_subtype, username:username, listing_id: lid}, function(data) {	
 			if(!that.blockSearch || active_load) { // else cancel the search...	
 				var new_markers = [];
 				var results_text = '';
@@ -986,7 +986,7 @@ function PanelManager(map) {
 	});	
 	
 	$('#search_text').autocomplete( {
-			url: "/data/autocomplete_search.php", 
+			url: "data/autocomplete_search.php", 
 			scrollHeight: 320,
 			extraParams: {
 					nlat: function() { return map.getBounds().getNorthEast().lat(); },
@@ -1137,7 +1137,7 @@ function PanelManager(map) {
 	
 	
 	this.login = function(form) {
-		$("#login_response").html('<img src="/images/wait_small.gif"/>');
+		$("#login_response").html('<img src="images/wait_small.gif"/>');
 		application.user.login(form, this.loginSuccess, this.loginFailure);
 	}
 	this.loginSuccess = function(name, last_lng, last_lat, last_zoom) {
@@ -1171,25 +1171,25 @@ function PanelManager(map) {
 	});
 	
 	this.register = function(form) {
-		$("#register_response").html('<img src="/images/wait_small.gif"/>');
+		$("#register_response").html('<img src="images/wait_small.gif"/>');
 		application.user.register(form, this.registerSuccess, this.registerFailure); 
 	}	
 	this.registerSuccess = function() {	
-		$("#register_response").html('<b style="color: green"><img src="/images/tick.jpeg" /> Great! We\'ve just sent you an email to confirm your email address, just click on the link in this email to complete sign up.</b>');			
+		$("#register_response").html('<b style="color: green"><img src="images/tick.jpeg" /> Great! We\'ve just sent you an email to confirm your email address, just click on the link in this email to complete sign up.</b>');			
 		$(".register_step_2").css("display", "table-row");	
 		$(".register_step_1").css("display","none");
 	}
 	this.registerFailure = function(error_message) {
-		$("#register_response").html('<b style="color: red"><img src="/images/cross.jpeg" />' + error_message + '</b>');
+		$("#register_response").html('<b style="color: red"><img src="images/cross.jpeg" />' + error_message + '</b>');
 	}
 	
 	this.registerConfirm = function(form) {
-		$("#register_response").html('<img src="/images/wait_small.gif"/>');
+		$("#register_response").html('<img src="images/wait_small.gif"/>');
 		application.user.registerConfirm(form, this.registerConfirmSuccess, this.registerConfirmFailure); 
 	}	
 	this.registerConfirmSuccess = function(name) {	
-		$("#register_response").html('<b style="color: green"><img src="/images/tick.jpeg" /> Hi! Youre logged in as ' +  name + '!</b>');			
-		$("#login_response").html('<b style="color: green"><img src="/images/tick.jpeg" /> Hi! Youre logged in as ' +  name + '!</b>');			
+		$("#register_response").html('<b style="color: green"><img src="images/tick.jpeg" /> Hi! Youre logged in as ' +  name + '!</b>');			
+		$("#login_response").html('<b style="color: green"><img src="images/tick.jpeg" /> Hi! Youre logged in as ' +  name + '!</b>');			
 		$(".register_step_2").css("display", "none");	
 		$(".register_step_1").css("display","table-row");
 		$(".show_logged_in").css("display", "block");
@@ -1198,16 +1198,16 @@ function PanelManager(map) {
 		that.openInboxWindow(1);
 	}
 	this.registerConfirmFailure = function(error_message) {
-		$("#register_response").html('<b style="color: red"><img src="/images/cross.jpeg" />' + error_message + '</b>');
+		$("#register_response").html('<b style="color: red"><img src="images/cross.jpeg" />' + error_message + '</b>');
 	}
 	
 	this.inviteConfirm = function(form) {
-		$("#register_response").html('<img src="/images/wait_small.gif"/>');
+		$("#register_response").html('<img src="images/wait_small.gif"/>');
 		application.user.inviteConfirm(form, this.inviteConfirmSuccess, this.inviteConfirmFailure); 
 	}	
 	this.inviteConfirmSuccess = function(name) {	
-		$("#register_response").html('<b style="color: green"><img src="/images/tick.jpeg" /> Hi! Youre logged in as ' +  name + '!</b>');			
-		$("#login_response").html('<b style="color: green"><img src="/images/tick.jpeg" /> Hi! Youre logged in as ' +  name + '!</b>');			
+		$("#register_response").html('<b style="color: green"><img src="images/tick.jpeg" /> Hi! Youre logged in as ' +  name + '!</b>');			
+		$("#login_response").html('<b style="color: green"><img src="images/tick.jpeg" /> Hi! Youre logged in as ' +  name + '!</b>');			
 		$(".register_step_2").css("display", "none");	
 		$(".register_step_1").css("display","table-row");
 		$(".show_logged_in").css("display", "block");
@@ -1216,20 +1216,20 @@ function PanelManager(map) {
 		that.openInboxWindow();
 	}
 	this.inviteConfirmFailure = function(error_message) {
-		$("#register_response").html('<b style="color: red"><img src="/images/cross.jpeg" />' + error_message + '</b>');
+		$("#register_response").html('<b style="color: red"><img src="images/cross.jpeg" />' + error_message + '</b>');
 	}
 	
 	////////////////////////////////////////////////////////////////////////////	
 	
 	this.loadProfile = function(username) {
-		$.get('/data/get_profile.php', {username: username}, function(data) {
+		$.get('data/get_profile.php', {username: username}, function(data) {
 			$('#pp_username').text(username);
 			$('#pp_full_name').text($(data).find('full_name').text());
 			$('#pp_www').html('<a href="' + $(data).find('www').text() + '" target="_blank">' + $(data).find('www').text() + '</a>');
 			$('#pp_blurb').text($(data).find('blurb').text());			
 		});	
 		
-		$.getJSON('/data/get_markers.php', {format:"json", username: username}, function(data) {
+		$.getJSON('data/get_markers.php', {format:"json", username: username}, function(data) {
 				$("#pp_listings").html(' ');
 				
 				$.each(data.markers, function(i, marker_args) {	
@@ -1467,7 +1467,7 @@ function User(map) {
 		if (this.username === null) {return false;} else {return true;}
 	}
 	this.refreshIsLoggedIn = function() {
-			$.post('/data/is_logged_in.php', {}, function(data) {
+			$.post('data/is_logged_in.php', {}, function(data) {
 				if($(data).find("response_state").attr("success") == 'true') {
 					that.email = $(data).find("user").attr("email");
 					that.full_name = $(data).find("user").attr("full_name");
@@ -1484,7 +1484,7 @@ function User(map) {
 	this.refreshIsLoggedIn();
 	 
 	this.logout = function(doOnSuccess) {
-		$.post('/data/logout.php', {}, function(data) {
+		$.post('data/logout.php', {}, function(data) {
 				$("#register_wait").css("display", "none");
 				if($(data).find("response_state").attr("success") == 'true') {
 					// all dood, null the user
@@ -1505,7 +1505,7 @@ function User(map) {
 		var password = form.password.value;
 			 
 		if(email_or_username != '' && password != '') {
-			$.post('/data/login.php', {email_or_username:email_or_username, password:password}, function(data) {
+			$.post('data/login.php', {email_or_username:email_or_username, password:password}, function(data) {
 				$("#register_wait").css("display", "none");
 				if($(data).find("response_state").attr("success") == 'true') {
 					that.email = $(data).find("user").attr("email");
@@ -1535,7 +1535,7 @@ function User(map) {
 		var username = form.username.value;
 	   
 		if(email != '' && password != '' && full_name != '' && username != '') {
-			$.post('/data/register.php', {email: email, password: password, full_name: full_name, username: username}, function(data) {
+			$.post('data/register.php', {email: email, password: password, full_name: full_name, username: username}, function(data) {
 				$("#register_wait").css("display", "none");
 				if($(data).find("response_state").attr("success") == 'true') {
 					if(doOnSuccess) {doOnSuccess();}	
@@ -1557,12 +1557,12 @@ function User(map) {
 	}
 	   
 	this.registerConfirm = function(form, doOnSuccess, doOnFailure) {				
-		document.getElementById('login_response').innerHTML = '<img src="/images/wait_small.gif"/>';	 
+		document.getElementById('login_response').innerHTML = '<img src="images/wait_small.gif"/>';	 
 		var email = form.email.value;
 		var rego_code = form.rego_code.value;
 	   
 		if(rego_code != '' && email != '') {
-			$.post('/data/register_confirm.php', {rego_code: rego_code, email: email}, function(data) {
+			$.post('data/register_confirm.php', {rego_code: rego_code, email: email}, function(data) {
 				$("#register_wait").css("display", "none");
 				if($(data).find("response_state").attr("success") == 'true') {
 					that.email = $(data).find("user").attr("email");
@@ -1589,7 +1589,7 @@ function User(map) {
 		var rego_code = form.rego_code.value;
 	   
 		if(email != '' && password != '' && full_name != '' && username != '') {
-				$.post('/data/invite_confirm.php', {email:email, password:password, full_name:full_name, username:username, rego_code:rego_code}, function(data) {
+				$.post('data/invite_confirm.php', {email:email, password:password, full_name:full_name, username:username, rego_code:rego_code}, function(data) {
 				$("#register_wait").css("display", "none");
 				if($(data).find("response_state").attr("success") == 'true') {
 					that.email = $(data).find("user").attr("email");
@@ -1611,8 +1611,8 @@ function User(map) {
 	}
 	   
 	this.conversationReply = function(conv_id, reply) {
-		$("#conversation_reply_button").html('<image id="conversation_reply_wait" src="/images/wait_small_white.gif"/>');
-		$.post('/data/add_conversation_message.php', {conversation_id: conv_id, message: reply}, function(data) {
+		$("#conversation_reply_button").html('<image id="conversation_reply_wait" src="images/wait_small_white.gif"/>');
+		$.post('data/add_conversation_message.php', {conversation_id: conv_id, message: reply}, function(data) {
 			that.refreshConversation(conv_id);
 		});
 	}
@@ -1620,7 +1620,7 @@ function User(map) {
 	this.conversationNew = function(usernames_or_email, title, message) {
 		$('#inbox_tabs').tabs( 'select' , 0 );
 		$("#conversation_reply_wait").css("display", "inline");
-		$.post('/data/add_conversation.php', {users: usernames_or_email, title: title, message: message}, function(data) {
+		$.post('data/add_conversation.php', {users: usernames_or_email, title: title, message: message}, function(data) {
 			that.refreshInboxConversations();
 		});
 	}
@@ -1632,13 +1632,13 @@ function User(map) {
 				conversation_ids += form.conversation_id[i].value + ',';
 			}
 		}
-		$.post('/data/delete_conversation.php', {conversation_ids: conversation_ids}, function(data) {
+		$.post('data/delete_conversation.php', {conversation_ids: conversation_ids}, function(data) {
 				that.refreshInboxConversations();
 		});
 	}
 	
 	this.rssAdd = function(url) {
-		$.post('/data/add_rss.php', {rss: url});
+		$.post('data/add_rss.php', {rss: url});
 	}
 	
 	this.refreshConversation = function(conv_id) {
@@ -1648,7 +1648,7 @@ function User(map) {
 				$("#message-edit").slideDown("fast");	
 			});
 			
-			$.post('/data/get_conversation.php', {conversation_id: conv_id}, function(data) {
+			$.post('data/get_conversation.php', {conversation_id: conv_id}, function(data) {
 				var title = $(data).find('conversation').attr("title");
 				$("#inbox_conversation").html('<div class="listing_div"><div class="listing_left" style="width: 20%;">&nbsp;</div><div class="listing_main"><h3>' + title + '</h3></div>');
 				$(data).find('conversation_message').each(function(j){
@@ -1667,7 +1667,7 @@ function User(map) {
 	this.refreshConversationNew = function(contact_details, type) {
 		$('#inbox_tabs').tabs( 'select' , 0 );
 		if(type == 'email' || type == 'username') {
-			$("#inbox_conversations").html('<h2 style="margin-left: 155px;">New Conversation</h2><p style="margin-left: 155px;">Between YOU and User ' + contact_details + '</p><hr><div id="conversation_reply" style="margin-left:155px;"><form action="#" name="replyform"><input name="title" style="width:400px;"/><br><textarea name="message" style="width:400px; height:100px;"></textarea><br><input type="button" value="Send" class="button" onclick="application.user.conversationNew(\'' + contact_details + '\', this.form.title.value, this.form.message.value);"><image style="margin: 4px; display:none;" id="conversation_reply_wait" src="/images/wait_small.gif"/></form></div> ');
+			$("#inbox_conversations").html('<h2 style="margin-left: 155px;">New Conversation</h2><p style="margin-left: 155px;">Between YOU and User ' + contact_details + '</p><hr><div id="conversation_reply" style="margin-left:155px;"><form action="#" name="replyform"><input name="title" style="width:400px;"/><br><textarea name="message" style="width:400px; height:100px;"></textarea><br><input type="button" value="Send" class="button" onclick="application.user.conversationNew(\'' + contact_details + '\', this.form.title.value, this.form.message.value);"><image style="margin: 4px; display:none;" id="conversation_reply_wait" src="images/wait_small.gif"/></form></div> ');
 		}
 		else if(type == 'text') {
 			$("#inbox_conversations").html('<h2 style="margin-left: 155px;">Contact Details</h2><p style="margin-left: 155px;">Contact Deatils: ' + contact_details + '</p>');
@@ -1682,7 +1682,7 @@ function User(map) {
 				$("#message-inbox").slideDown("fast");
 				$("#message-edit").css('display', 'none');
 			});
-			$.post('/data/get_all_conversations.php', {}, function(data) {
+			$.post('data/get_all_conversations.php', {}, function(data) {
 				$("#inbox_conversations").html('');
 				$(data).find('conversation').each(function(j){
 					var title = $(this).attr("title");
@@ -1691,7 +1691,7 @@ function User(map) {
 					var timestamp = $(this).attr("timestamp");
 					var last_message = $(this).attr("last_message");
 					var read_flag = '';
-					if($(this).attr("read_flag") == 0) {var read_flag = '<image src="/images/unread_star.jpg"/>';}
+					if($(this).attr("read_flag") == 0) {var read_flag = '<image src="images/unread_star.jpg"/>';}
 					var conversations_text = '<div class="listing_left" style="width: 5%; clear: left;">' + read_flag + '<input name="conversation_id" type="checkbox" value="' + conversation_id + '"/></div><div class="listing_left" style="width: 15%;">' + participants + '<br><div class="listing_sub">' + timestamp + '</div></div><div class="listing_main"><a href="#" onclick="application.user.refreshConversation(' + conversation_id + '); return(false);">' + title + ' &nbsp; &nbsp; (view message)</a><div class="listing_sub">' + last_message + '</div></div>';
 					$('<div class="listing_div"></div>').html(conversations_text).appendTo("#inbox_conversations");
 				});
@@ -1702,12 +1702,12 @@ function User(map) {
 	this.refreshInboxRss = function() {
 		/*if(this.isLoggedIn()) {
 			$("#news_wait").css("display", "inline");
-			$.post('/data/get_inbox_rss.php', {}, function(data) {
+			$.post('data/get_inbox_rss.php', {}, function(data) {
 				$("#news_wait").css("display", "none");
 				$("#inbox_rss_feeds").html(' ');
 				$(data).find('feed').each(function(j){
 					var url = $(this).attr("url");
-					var feeds_text = '<div class="listing_left" style="width: 5%; clear: left;"><input type="checkbox"/></div><div class="listing_main" id="inbox_rss_' + j + '" style="width: 85%;"><img src="/images/wait_small.gif"/></div>';
+					var feeds_text = '<div class="listing_left" style="width: 5%; clear: left;"><input type="checkbox"/></div><div class="listing_main" id="inbox_rss_' + j + '" style="width: 85%;"><img src="images/wait_small.gif"/></div>';
 					$('<div class="listing_div" style="min-height: 5em;"></div>').html(feeds_text).appendTo("#inbox_rss_feeds");
 					
 					$.getFeed({
@@ -1732,7 +1732,7 @@ function User(map) {
 	this.refreshInboxMarkers = function() {
 		if(this.isLoggedIn()) {
 			$("#resources_wait").css("display", "inline");
-			$.getJSON('/data/get_markers.php', {format:"json", username: this.username}, function(data) {
+			$.getJSON('data/get_markers.php', {format:"json", username: this.username}, function(data) {
 				$("#inbox_markers").html(' ');
 				$("#resources_wait").css("display", "none");
 				
