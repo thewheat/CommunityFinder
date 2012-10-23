@@ -22,11 +22,14 @@ require_once('./data/bootstrap.php');require_once('./data/functions.php'); ?><!D
 		<script type='text/javascript' src="javascript/jquery.clearableTextField.js"></script> 
 
 		<?php	
-			print('<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=' . $SITE['GOOGLE_KEY'] . '" type="text/javascript"></script>' . "\n");
+			#print('<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=' . $SITE['GOOGLE_KEY'] . '" type="text/javascript"></script>' . "\n");
 		?>
 
-		<script src="./javascript/ClusterMarker.js" type="text/javascript"></script>
-		<script src="./javascript/app.js" type="text/javascript"></script>
+    	<script src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+		<?php # <script src="javascript/ClusterMarker.js" type="text/javascript"></script> ?>
+		<script src="../mobileapp-source/javascript/markerclusterer.js" type="text/javascript"></script>
+		<script src="../mobileapp-source/javascript/infobubble.js" type="text/javascript"></script>
+		<script src="javascript/app.js" type="text/javascript"></script>
 		<script type="text/javascript">
 
 		$(document).ready(function () {
@@ -55,7 +58,8 @@ require_once('./data/bootstrap.php');require_once('./data/functions.php'); ?><!D
 					} else {$intro = null;}
 					
 					// init the map
-					print("map.setCenter(new GLatLng(parseFloat($lat),parseFloat($lng)), $zoom );\n\t\t\t");
+					#print("map.setCenter(new GLatLng(parseFloat($lat),parseFloat($lng)), $zoom );\n\t\t\t");
+					print("map.setCenter(new google.maps.LatLng(parseFloat($lat),parseFloat($lng)), $zoom );\n\t\t\t");
 
 					// init restrictions
 					if($r_username) {
@@ -354,14 +358,14 @@ require_once('./data/bootstrap.php');require_once('./data/functions.php'); ?><!D
 				</div>
 			</div>
 		</div>
-		<div id="map_zoom_div" class="ui-corner-all">
+		<div id="map_zoom_div" class="ui-corner-all" style="display:none;">
 					<a id="" href="#" class="map-button fg-button ui-state-default fg-button-icon-solo ui-corner-top" style="margin: 0px;" title="Zoom In" onclick="map.zoomIn(); application.resourceManager.endMapDrag(); return false;"><span class="ui-icon ui-icon-zoomin"></span>Zoom In</a>
 					<a id="" href="#" class="map-button fg-button ui-state-default fg-button-icon-solo ui-corner-bottom" style="margin: 0px;" title="Zoom Out" onclick="map.zoomOut(); application.resourceManager.endMapDrag(); return false;"><span class="ui-icon ui-icon-zoomout"></span>Zoom Out</a>
 		</div>
-		<div id="map_add_div" class="ui-corner-all">
+		<div id="map_add_div" class="ui-corner-all" style="display:none;">
 					<a id="" href="#" class="map-button fg-button ui-state-default fg-button-icon-solo ui-corner-all" style="margin: 0px;" title="Add Listing" onclick="application.resourceManager.widgetRunSearch({text: '', subtypes: ''});$('#map_dialog_add').dialog('open');return(false);"><span class="ui-icon ui-icon-plusthick"></span>Add Listing</a>
 		</div>
-		<div id="map_tools_div" class="ui-corner-all">
+		<div id="map_tools_div" class="ui-corner-all" style="display:none;">
 					<a id="" href="#" class="map-button fg-button ui-state-default fg-button-icon-solo ui-corner-top" style="margin: 0px;" title="Website Plugin: Customise the network for your Website" onclick="$('#map_dialog_plugin').dialog('open');return(false);"><span class="ui-icon ui-icon-image"></span>Website Plugin</a>
 					<a id="" href="#" class="map-button fg-button ui-state-default fg-button-icon-solo ui-corner-bottom" style="margin: 0px;" title="Find and contact your local members of parliament" onclick="$('#map_dialog_yvih').dialog('open');return(false);"><span class="ui-icon ui-icon-check"></span>Your Voice In House</a>
 		</div>
