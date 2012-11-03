@@ -1,9 +1,38 @@
 =========================
 Installation Instructions
 =========================
+
 Import db-dump/db.sql into the database
-Copy "webapp-source" to your web server directory
-Edit data/bootstrap.php
+
+Point a Vhost to "webapp-source" directory, i.e.:
+
+<Directory "/Library/WebServer/Documents/communityfinder/">
+Allow From All
+AllowOverride All
+</Directory>
+<VirtualHost *:80>
+	ServerName "communityfinder.net"
+	DocumentRoot "/Library/WebServer/Documents/communityfinder/webapp-source"
+	ErrorLog /Library/WebServer/Documents/communityfinder/error.log
+</VirtualHost>
+
+
+Edit data/bootstrap.php to reflect your database settings and domain name
 	You may need to create a Google API key (https://code.google.com/apis/console/)
 		Directions: https://developers.google.com/maps/documentation/javascript/tutorial#api_key
-	Turn PHP error reporting for notices off or it will break things
+	
+
+Turn PHP error reporting for notices off or it will break things
+
+Mobile - WIP
+
+An equivalent VHost record
+<Directory "/Library/WebServer/Documents/communityfinder/">
+Allow From All
+AllowOverride All
+</Directory>
+<VirtualHost *:80>
+	ServerName "m.communityfinder.net"
+	DocumentRoot "/Library/WebServer/Documents/communityfinder/mobileapp-source"
+	ErrorLog /Library/WebServer/Documents/communityfinder/error.log
+</VirtualHost>
