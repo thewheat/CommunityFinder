@@ -24,7 +24,9 @@ Edit data/bootstrap.php to reflect your database settings and domain name
 
 Turn PHP error reporting for notices off or it will break things
 
+=========================
 Mobile - WIP
+=========================
 
 An equivalent VHost record
 <Directory "/Library/WebServer/Documents/communityfinder/">
