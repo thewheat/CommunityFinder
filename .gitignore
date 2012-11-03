@@ -1,0 +1,6 @@
+#temp linux files
+*~
+*.kate-swp
+.directory
+
+.DS_Store

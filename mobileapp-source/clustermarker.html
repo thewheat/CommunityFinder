@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Google Maps JavaScript API v3 Example: Map Simple</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+      /*
+      html, body, #map_canvas {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+      }
+      */
+      #map_canvas {
+		height: 600px; 
+		width: 100%;
+      }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+    <script src="javascript/markerclusterer.js"></script>
+    <script src="javascript/jquery.js"></script>
+    
+    <script>
+		var map;
+		var markers = [];
+		var markerCluster;
+		// google.maps.event.addDomListener(window, 'load', initialize);
+		$(document).ready(function(){
+			function initialize() {
+					var mapOptions = {
+						zoom: 8,
+						center: new google.maps.LatLng(-34.397, 150.644),
+						mapTypeId: google.maps.MapTypeId.ROADMAP
+					};
+					map = new google.maps.Map(document.getElementById('map_canvas'), mapOptions);
+					google.maps.event.addListener(map, 'click', function(point) {
+						
+					});
+					
+					// gridSize: number of squares map is divided into
+					// maxZoom : any zoom level above (i.e. more zoomed in) will not show clustering
+					var mcOptions = {gridSize: 50, maxZoom: 10};
+					markerCluster = new MarkerClusterer(map, markers, mcOptions);
+					google.maps.event.addListener(map, 'zoom_changed', function() {
+					});
+					
+			}
+			function addMarker(pos, map){
+				var marker = new google.maps.Marker({
+						position: pos,
+						map: map,
+						});
+				//markers.push(marker);
+				markerCluster.addMarker(marker);
+				
+			}
+			function addMarkerRandom(map){
+				var ne = map.getBounds().getNorthEast();
+				var sw = map.getBounds().getSouthWest();
+				var pos = new google.maps.LatLng(randomFromInterval(sw.lat(), ne.lat()), randomFromInterval(sw.lng(), ne.lng()));
+				addMarker(pos,map);
+			}
+			
+          
+			initialize();
+			$("#btnLoad").click(function(e){
+				loadMarkers();
+			});
+			$("#btnCluster").click(function(e){
+			});
+			$("#btnAdd").click(function(e){
+				for(var i = 0; i < 20; i++){
+					addMarkerRandom	(map);
+				}
+				//markerCluster = new MarkerClusterer(map, markers);
+			});
+		});
+		function randomFromInterval(from,to)
+		{
+			var MULTIPLIER = 1000;
+			return Math.floor(Math.random()*(to*MULTIPLIER-from*MULTIPLIER+1)+from*MULTIPLIER)/MULTIPLIER;
+		}				
+	loadMarkers = function(args) {			
+	
+		/*var defaults = {  
+			active_load: 0,
+			open_exact: 0,
+			wide_search: 0,
+			filter_text: 	"",  
+			filter_subtype: "",  
+			username: 	"",  
+			lid: "",
+		}; 
+		var args = $.extend(defaults, args);
+		args.username = (that.restrict_username) ? that.restrict_username : args.username;
+		*/
+	
+		// get the current filter & restrict requirements
+		var that = {'restrict_subtype':''};
+		that.markers = [];
+		that.markers_cluster_id = [];
+		that.clearAllMarkers = function(){};
+		that.createMarker = function(args) {
+			//var marker = new GMarker(args.point, {icon: application.resourceManager.marker_types[args.subtype], title: args.name + ' (' + args.subtype + ')'});	
+			var marker = new google.maps.Marker(args.point, {title: args.name + ' (' + args.subtype + ')'});	
+
+			marker.lid = (args && args.lid) ? args.lid : null;
+			marker.username = (args && args.username) ? args.username : '';
+			marker.type = (args && args.type) ? args.type : '';
+			marker.subtype = (args && args.subtype) ? args.subtype : '';
+			marker.subtype_name = (args && args.subtype_name) ? args.subtype_name : '';
+			marker.name = (args && args.name) ? args.name : '';;
+			marker.desc = (args && args.desc) ? args.desc : '';;
+			marker.www = (args && args.www) ? args.www : '';
+			marker.wiki = (args && args.wiki) ? args.wiki : '';
+			marker.rss = (args && args.rss) ? args.rss : '';
+			marker.address = (args && args.address) ? args.address : '';
+			marker.phone = (args && args.phone) ? args.phone : '';
+
+			marker.datetime_on = (args && args.datetime_on) ? args.datetime_on : '';
+
+			var start_datetime_str = (args && args.start_datetime_on) ? args.start_datetime_on : 0;
+			var end_datetime_str = (args && args.end_datetime_on) ? args.end_datetime_on : 0;
+
+			marker.start_datetime =   new Date(); // current date / time
+			if(start_datetime_str != '' && !start_datetime_str.match(/0000/)) {
+				var sdt_array = start_datetime_str.split(/\W/); // must be YYYY-MM-DD HH:MM:SS
+				marker.start_datetime.setUTCFullYear(sdt_array[0], (sdt_array[1] - 1), sdt_array[2] ); 
+				marker.start_datetime.setUTCHours(sdt_array[3], sdt_array[4]); 
+			}
+			
+			marker.end_datetime =   new Date(); // current date / time
+			if(end_datetime_str != '' && !end_datetime_str.match(/0000/)) {
+				var edt_array = end_datetime_str.split(/\W/); // must be YYYY-MM-DD HH:MM:SS
+				marker.end_datetime.setUTCFullYear(edt_array[0], (edt_array[1] - 1), edt_array[2] ); 
+				marker.end_datetime.setUTCHours(edt_array[3], edt_array[4]); 
+			}
+			
+			//marker.tags = tags;
+			/////////////////
+			
+			
+			var tags = (args && args.tags) ? args.tags : '';
+
+			marker.tags = new Array();		
+			if(tags != '') {	
+				var split_tags = tags.split(',');		
+				for (var i in split_tags){
+						if(split_tags[i].match(/:/)) {
+								var split_tag = split_tags[i].split(':');
+								// check if prefix array already exists
+								split_tag[0] = split_tag[0].replace(/\s/g, '_'); // underscore all spaces
+								if(marker.tags[split_tag[0]] == undefined) {
+									marker.tags[split_tag[0]] = new Array();// add new prefix array
+								}
+								marker.tags[split_tag[0]].push(split_tag[1]);// push tag on existing prefix array
+						}
+						else {
+								if(marker.tags['general'] == undefined) {
+									marker.tags['general'] = new Array();// add new general array
+								}
+								marker.tags['general'].push(split_tags[i]);
+						} 
+				}
+			}
+					
+			
+			///////////////////
+			marker.current_window = null;  //TODO check if used?
+			marker.is_invite = (args && args.ac_on) ? args.ac_on : '';
+			marker.invite_email = (args && args.ac_email) ? args.ac_email : '';
+			marker.invite_url = (args && args.ac_url) ? args.ac_url : '';
+			//marker.invite_text = (args && args.invite_text) ? args.invite_text : '';
+
+			return marker;
+		}
+		
+
+
+		var active_load = (args && args.activeLoad) ? args.activeLoad : 0;
+		var filter_text = (args && args.text) ? args.text : '';
+		var filter_subtype = (args && args.subtype) ? args.subtype : '';
+		if (filter_subtype == '' || filter_subtype == 'ALL' || filter_subtype == 'all') {
+			filter_subtype = that.restrict_subtype;	
+		}
+		var username = (args && args.username) ? args.username : '';
+		var username = (that.restrict_username) ? that.restrict_username : username;
+		
+		var open_exact = (args && args.openExact) ? args.openExact : '';
+		var lid = (args && args.lid) ? args.lid : '';
+		var wide_search = (args && args.wideSearch) ? args.wideSearch : '';
+		if(wide_search) { // pass bounds through as empty if searching wider than current area
+			var north_lat = '';
+			var east_lng = '';
+			var south_lat = '';
+			var west_lng = '';	
+		}
+		else {
+			var Bounds = map.getBounds();
+			var NorthEast = Bounds.getNorthEast();
+			var SouthWest = Bounds.getSouthWest();
+			var north_lat = NorthEast.lat();
+			var east_lng = NorthEast.lng();
+			var south_lat = SouthWest.lat();
+			var west_lng = SouthWest.lng();	
+		}
+		
+		$.getJSON('../webapp-source/data/get_markers.php', {format:"json",north_lat:north_lat, east_lng:east_lng, south_lat:south_lat, west_lng:west_lng, filter_text: filter_text, filter_subtype: filter_subtype, username:username, listing_id: lid}, function(data) {	
+			if(!that.blockSearch || active_load) { // else cancel the search...	
+				var new_markers = [];
+				var results_text = '';
+
+				that.clearAllMarkers();
+
+				var results_found = 0;
+				var last_id = null;
+				
+				$.each(data.markers, function(i, marker_args) {	
+					try
+					{
+						console.log(i + ". " + marker_args.lat);
+						console.log(i + ". " + marker_args.lng);
+						var marker = new google.maps.Marker({
+								position: new google.maps.LatLng(parseFloat(marker_args.lat),parseFloat(marker_args.lng)),
+								map: map,
+								image: '../webapp-source/images/community_garden.png',
+								});
+						//markers.push(marker);
+						markerCluster.addMarker(marker);
+
+					}
+					catch(err){
+console.log(err);
+					}
+					return;
+					results_found = i + 1;
+					//marker_args.point = new GLatLng(parseFloat(marker_args.lat),parseFloat(marker_args.lng));
+				
+					try
+					{
+						marker_args.point = new google.maps.LatLng(parseFloat(marker_args.lat,parseFloat(marker_args.lng)));
+					}catch(err){return;}
+					
+					last_id = marker_args.lid; // to be able to open exact match listing
+					
+					// create the marker
+					var marker = that.createMarker(marker_args);
+					
+					try
+					{
+					markerCluster.addMarker(marker);
+					}catch(err){return;}
+					var desc_short = (marker.desc.length > 160) ? marker.desc.substring(0, 160) + '...' : marker.desc; 
+					desc_short = (desc_short) ? desc_short + '<br/>' : '';
+					var address_text = (marker.address) ? '<br/>Address: ' + marker.address + '<br/>' : '';
+					var phone_text = (marker.phone) ? '<br/>Phone: ' + marker.phone + '<br/>' : '';
+					var full_tag_text = '';					
+					if(marker.tags != null) {
+						for (var prefix in marker.tags) {
+							full_tag_text += (full_tag_text) ? '. &nbsp; <b> ' + prefix.replace(/_/g, ' ') + ':</b> ' : '<b> ' + prefix.replace(/_/g, ' ') + ':</b> ';
+							var tag_text = '';
+							for(var j in marker.tags[prefix]) {
+								var link = '<a class="tag_link" href="#" title="Show all listings tagged with \'' + marker.tags[prefix][j] + '\' in the current map area." onclick="application.resourceManager.widgetRunSearch({text:\'' + marker.tags[prefix][j] + '\'});return false;">' + marker.tags[prefix][j] + '</a>';
+								tag_text += (tag_text) ? ', ' + link : link; 
+							}
+							full_tag_text += tag_text;
+						}
+					}
+						
+					results_text += '<div class="main_results" style="padding: 0.4em 0.6em;"><div style="margin: 4px 0px;  border-top: 1px dotted;"><a href="#" onclick="application.resourceManager.openMarker(' + marker_args.lid + '); application.panelManager.hideResults(); return(false);">' + marker_args.name + '</a> &nbsp; (<a class="tag_link" href="#" title="Show all listings of category \'' + marker_args.subtype_name + '\' in the current map area." onclick="application.resourceManager.widgetRunSearch({text:\'' + marker_args.subtype_name + '\'});return false;">' + marker_args.subtype_name + '</a>)</div><div class="subtle_text" style="font-size: 0.9em;"> ' + desc_short + address_text + phone_text + '</div><div class="subtle_text" style="font-size: 0.9em; margin-top:0.2em;">' + full_tag_text + '</div></div>';
+					new_markers[i] = marker;
+					
+					that.markers[marker_args.lid] = marker;
+					that.markers_cluster_id[marker_args.lid] = i;
+					
+				});
+return;
+				if(results_text == '') {
+					results_text = '<div style="padding: 0.4em 0.6em;">Sorry, there are no matching listings in this area, try <a href="#" onclick="map.zoomOut(); application.resourceManager.endMapDrag(); return false;">zooming out</a> or <a href="#" onclick="$(\'#search_text\').focus().select();application.panelManager.flashSearchBox();return(false);">change your search</a>.</div>';
+					$("#searchPanelNoResults").html(results_text);
+					$("#searchPanelResultsFound").html('<b><span style="font-size: 1.2em;">0</span> results found</b>');
+					if(typeof(callback) == 'function') { callback(); } 
+					application.panelManager.showNoResults();
+				}
+				else {
+					$("#searchPanelResultsListings").html(results_text);
+					$("#searchPanelResultsFound").html('<b><span style="font-size: 1.2em;">' + results_found + '</span> results found </b>');
+					
+					//markerCluster.addMarkers(new_markers);
+					//application.resourceManager.cluster.addMarkers(new_markers);
+					//application.resourceManager.cluster.refresh();		
+					//application.panelManager.hideNoResults();
+					
+					//application.panelManager.feedsCustomize();				
+					
+					if(open_exact && results_found === 1) { 
+//						application.resourceManager.openMarker(last_id);
+					} 
+					else if(args && args.activeLoad) {
+//						application.panelManager.showResults();	
+					}
+
+				}
+				$('#map_filter_center').animate( { backgroundColor: "#FFDE40" }, { queue:true, duration:200 } ).animate( { backgroundColor: application.panelManager.search_bg_color }, { queue:true, duration:1000 } );
+				map.enableDragging();
+				
+				that.markerTip = function() {
+					$("img[id^='mtgt']").qtip({
+								position: {
+									corner: {
+									   tooltip: 'bottomMiddle',
+									   target: 'topMiddle'
+									}
+								 },
+								 style: {
+										tip: true, // Give it a speech bubble tip with automatic corner detection
+										name: 'green',
+										fontWeight: 800,
+										
+										border: {
+											 width: 4,
+											 radius: 6
+										},
+										textAlign: 'center'
+								 },
+								 show: {solo: true}
+					});		
+				}
+				setTimeout("application.resourceManager.markerTip()", 1000);
+
+				// add tooltips for tags and categories				
+				$(".tag_link").qtip({
+					position: {
+						corner: {
+						   tooltip: 'bottomMiddle',
+						   target: 'topMiddle'
+						}
+					 },
+					 style: {
+							tip: true, // Give it a speech bubble tip with automatic corner detection
+							name: 'green',
+							fontWeight: 800,
+							border: {
+								 width: 4,
+								 radius: 6
+							},
+							textAlign: 'center'
+					 },
+					 show: {solo: true}
+				});	
+				
+				$("#search_widget_button").html('Go');
+				$("#search_indicator").hide();
+
+			}
+			else {
+				$("#search_widget_button").html('Go');	
+				$("#search_indicator").hide();
+
+			}
+		});		
+		}
+    </script>
+  </head>
+  <body>
+    <div id="map_canvas"></div>
+	<input id='btnLoad' type='button' value='Load'>
+<!--	<input id='btnAdd' type='button' value='Add'>
+	<input id='btnCluster' type='button' value='Cluster'>
+-->
+  </body>
+</html>

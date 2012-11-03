@@ -1,0 +1,9 @@
+=========================
+Installation Instructions
+=========================
+Import db-dump/db.sql into the database
+Copy "webapp-source" to your web server directory
+Edit data/bootstrap.php
+	You may need to create a Google API key (https://code.google.com/apis/console/)
+		Directions: https://developers.google.com/maps/documentation/javascript/tutorial#api_key
+	Turn PHP error reporting for notices off or it will break things
