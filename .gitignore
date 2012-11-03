@@ -2,3 +2,5 @@
 *~
 *.kate-swp
 .directory
+
+.DS_Store
