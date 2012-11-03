@@ -3,11 +3,9 @@
 // GMarker
 ///////////////////////////////////////////////////////////////////////////////
 
-
-google.maps.Marker.prototype.openInformationWindow = function(openTab) {
-	console.log("google.maps.Marker.prototype.openInformationWindow");
+GMarker.prototype.openInformationWindow = function(openTab) {
 	var that = this;
-	var lat_lng = this.getPosition();
+	var lat_lng = this.getLatLng();
 	var openTabIndex = (openTab == 'edit') ? 3 : 0;
 	
 	var Bounds = map.getBounds();
@@ -122,9 +120,6 @@ google.maps.Marker.prototype.openInformationWindow = function(openTab) {
 	var height = '400';
 	var subtype = 'all';
 	var width = '600';
-	var infoBubble = new InfoBubble({
-      maxWidth: width
-    });
 
 	var text_share = '<div class="info_window" style="height: 130px; overflow:hide;">'; 
 	text_share += '<p><img style="margin-bottom: -4px;" src="images/twitter_share.png" /> <a target="_blank" href="http://twitter.com/home?status=Just found ' + this.name + '. http://victoriacommunity.org/index.php?lid=' + this.lid + '">Tweet about it on Twitter</a></p>';
@@ -191,33 +186,14 @@ google.maps.Marker.prototype.openInformationWindow = function(openTab) {
 		else {text_edit += '<b>Note</b>: You need to <a href="#" onclick="application.panelManager.openLoginWindow(); return(false);">Login</a> to delete anonymous listings.';	}
 		text_edit += '</form>';	
 
-/*
-		this.openInfoWindowTabsHtml([new GInfoWindowTab('Info', text), 
-			new GInfoWindowTab('Comment',text_comments), 
-			new GInfoWindowTab('Share',text_share), 
-			new GInfoWindowTab('Edit',text_edit)], 
-			{selectedTab: openTabIndex});
- */
- // todo - implement openTabIndex
-		infoBubble.addTab('Info', text);
-		infoBubble.addTab('Comment',text_comments);
-		infoBubble.addTab('Share',text_share);
-		infoBubble.addTab('Edit',text_edit); 
-        infoBubble.open(map,this);
-        
+		this.openInfoWindowTabsHtml([new GInfoWindowTab('Info', text), new GInfoWindowTab('Comment',text_comments), new GInfoWindowTab('Share',text_share), new GInfoWindowTab('Edit',text_edit)], {selectedTab: openTabIndex});
 	} 
 	else {
-		//this.openInfoWindowTabsHtml([new GInfoWindowTab('Info', text), new GInfoWindowTab('Comment',text_comments), new GInfoWindowTab('Share',text_share)], {selectedTab: openTabIndex});
- // todo - implement openTabIndex
-		infoBubble.addTab('Info', text);
-		infoBubble.addTab('Comment',text_comments);
-		infoBubble.addTab('Share',text_share);
-        infoBubble.open(map,this);
+		this.openInfoWindowTabsHtml([new GInfoWindowTab('Info', text), new GInfoWindowTab('Comment',text_comments), new GInfoWindowTab('Share',text_share)], {selectedTab: openTabIndex});
 	}
 	
 	// add datepicker to date fields, HACK: setTimeout a bit dodgie
 	addDatepicker = function() {
-		console.log("	addDatepicker = function() {")
 		$('#datepicker').datepicker({inLine: false, dateFormat: 'dd-mm-yy' }); 
 		$('#datepicker_end').datepicker({inLine: false, dateFormat: 'dd-mm-yy' });	
 	}
@@ -243,7 +219,6 @@ google.maps.Marker.prototype.openInformationWindow = function(openTab) {
 	var content = '<img src="http://www.shrinktheweb.com/xino.php?embed=1&STWAccessKeyId=35b970f614349ea&stwsize=xlg&stwUrl=' + this.www + '" />';
 	// Setup the tooltip with the content
 	addPreview = function() {
-		console.log("addPreview = function() {");
 		$('#listing_site_preview').qtip(
 		   {
 			 content: content,
@@ -271,7 +246,6 @@ google.maps.Marker.prototype.openInformationWindow = function(openTab) {
 	setTimeout('addPreview()', 2000);
 
 	addTagLinks = function() {
-		console.log("addTagLinks = function() {");
 		$(".tag_link").qtip({
 			position: {
 				corner: {
@@ -297,7 +271,6 @@ google.maps.Marker.prototype.openInformationWindow = function(openTab) {
 	
 	//for buttons, double upped TODO abstract this...
 	fixButtons = function() {
-		console.log("fixButtons = function() {");
 		$(".fg-button:not(.ui-state-disabled)")
 			.hover(
 				function(){ 
@@ -333,8 +306,7 @@ google.maps.Marker.prototype.openInformationWindow = function(openTab) {
 	that.loadComments();
 
 }
-google.maps.Marker.prototype.addToDB = function(doOnComplete) {
-	console.log("google.maps.Marker.prototype.addToDB");
+GMarker.prototype.addToDB = function(doOnComplete) {
 	var lat_lng = this.getLatLng()
 	var that = this;
 	
@@ -346,7 +318,6 @@ google.maps.Marker.prototype.addToDB = function(doOnComplete) {
 	url += 'lat=' + lat_lng.lat() + '&';
 	url += 'lng=' + lat_lng.lng();
 	$.post('data/add_resource.php', {title: this.name, desc: this.desc, type:this.type, subtype:this.subtype, lat:lat_lng.lat(), lng:lat_lng.lng()}, function(data) { 
-		console.log("$.post('data/add_resource.php', {title: this.name, desc: this.desc, type:this.type, subtype:this.subtype, lat:lat_lng.lat(), lng:lat_lng.lng()}, function(data) { ");
 		if($(data).find("response_state").attr("success") == 'true') {
 			//doOnComplete(data);
 			that.lid = $(data).find("marker").attr("lid");
@@ -354,17 +325,14 @@ google.maps.Marker.prototype.addToDB = function(doOnComplete) {
 		}
 	 });		
 }
-google.maps.Marker.prototype.deleteToDB = function() {
-	console.log("google.maps.Marker.prototype.deleteToDB");
+GMarker.prototype.deleteToDB = function() {
 	var that = this;
 	$.post('data/delete_resource.php', {lid: this.lid}, function() {
-		console.log("$.post('data/delete_resource.php', {lid: this.lid}, function() {");
 		map.removeOverlay(that);
 		application.resourceManager.markers[that.lid].deleted = true;//TODO fix this
 	});
 }
-google.maps.Marker.prototype.updateToDB = function(form) {
-	console.log("google.maps.Marker.prototype.updateToDB");
+GMarker.prototype.updateToDB = function(form) {
 	this.name = form.elements['name'].value;
 	this.desc = form.elements['description'].value;
 	this.phone = form.elements['phone'].value;
@@ -430,8 +398,7 @@ google.maps.Marker.prototype.updateToDB = function(form) {
 	//reset search so is matches added marker
 	application.resourceManager.current_marker.openInformationWindow();
 }
-google.maps.Marker.prototype.addCommentToDB = function(form) {
-	console.log("google.maps.Marker.prototype.addCommentToDB");
+GMarker.prototype.addCommentToDB = function(form) {
 	var that = this;
 	var comment_text = form.elements['comment'].value;
 	$.post('data/add_listing_comment.php', {lid:this.lid, comment_text:comment_text});
@@ -441,18 +408,15 @@ google.maps.Marker.prototype.addCommentToDB = function(form) {
 	
 	$("#listing_comments_add").hide();
 }
-google.maps.Marker.prototype.reportCommentToDB = function(form) {
-	console.log("google.maps.Marker.prototype.reportCommentToDB");
+GMarker.prototype.reportCommentToDB = function(form) {
 	var that = this;
 	that.loadComments();	
 	$("#listing_comments_report").hide();
 }	
-google.maps.Marker.prototype.loadComments = function() {
-	console.log("google.maps.Marker.prototype.loadComments");
+GMarker.prototype.loadComments = function() {
 	var that = this;
 	$("#listing_comments_results").html("");
 	$.get('data/get_marker_comments.php', {lid: that.lid}, function(data) {	
-		console.log("$.get('data/get_marker_comments.php', {lid: that.lid}, function(data) {	");
 		var flag = 0;
 		$(data).find('comment').each(function(i) {
 			flag = 1;
@@ -479,7 +443,6 @@ google.maps.Marker.prototype.loadComments = function() {
 ///////////////////////////////////////////////////////////////////////////////
 
 function ResourceManager(map) {	
-	console.log("function ResourceManager(map) {	");
 	var that = this;
 	this.marker_types = [];
 	
@@ -497,49 +460,23 @@ function ResourceManager(map) {
 	this.restrict_username = null;
 		
 	this.addMarkerTypes = function(callback) {
-		console.log("this.addMarkerTypes = function(callback) {");
-		/*var baseIcon = new GIcon();
+		var baseIcon = new GIcon();
 		baseIcon.image = "http://www.google.com/mapfiles/markera.png";
 		baseIcon.shadow = "http://www.victoriamycommunity.org/images/shadow.png";
 		baseIcon.iconSize = new GSize(30, 30);
 		baseIcon.shadowSize = new GSize(31, 32);
 		baseIcon.iconAnchor = new GPoint(16, 16);
 		baseIcon.infoWindowAnchor = new GPoint(13, 1);		
-		*/
-		var baseIcon=new google.maps.MarkerImage(
-			'http://www.google.com/mapfiles/markera.png',
-			new google.maps.Size(30,30),
-			new google.maps.Point(16, 16)
-			);
 
-		/*var cluster_icon = new GIcon(baseIcon);
+		var cluster_icon = new GIcon(baseIcon);
 		cluster_icon.image = '/images/cluster.png';
 		cluster_icon.iconSize = new GSize(40, 40);
-		cluster_icon.shadow = null;*/
-		var cluster_icon=new google.maps.MarkerImage(
-			'../images/cluster.png',
-			new google.maps.Size(38,38),   // size of orignal image
-			new google.maps.Point(0, 0),   // origin
-			new google.maps.Point(15, 15), // anchor based on scaled image
-			new google.maps.Size(30,30)    // size to scaled image to
-			);
+		cluster_icon.shadow = null;
 
-		//this.cluster = new ClusterMarker(map, {intersectPadding: -6, clusterMarkerIcon: cluster_icon});
+		this.cluster = new ClusterMarker(map, {intersectPadding: -6, clusterMarkerIcon: cluster_icon});
 		//this.cluster.clusterMarkerClick=function() { that.cluster.fitMapMaxZoom(1) };
-		this.cluster = new MarkerClusterer(map, that.markers, {
-			gridSize: 50
-			, maxZoom: 14
-			, style: [{
-		        url: '../images/cluster.png',
-		        height: 38,
-		        width: 38,
-		        opt_anchor: [16, 0],
-		        opt_textColor: '#FF00FF'
-				}],
-		});
 		
 		$.get('data/get_subtypes.php', {restrict_subtype: that.restrict_subtype}, function(data) {
-			console.log("$.get('data/get_subtypes.php', {restrict_subtype: that.restrict_subtype}, function(data) {");
 			var type_heading = '';
 			$(data).find('icon').each(function(i) {	
 				var subtype = $(this).attr('subtype');
@@ -552,15 +489,8 @@ function ResourceManager(map) {
 				var prefixes_help = $(this).attr("prefixes_help");
 	
 				//TODO: remove and combine with above code?
-				//that.marker_types[subtype] = new GIcon(baseIcon);
-				//that.marker_types[subtype].image = image;	
-				that.marker_types[subtype]=new google.maps.MarkerImage(
-					image,
-					new google.maps.Size(38,38),   // size of orignal image
-					new google.maps.Point(0, 0),   // origin
-					new google.maps.Point(15, 15), // anchor based on scaled image
-					new google.maps.Size(30,30)    // size to scaled image to
-				);
+				that.marker_types[subtype] = new GIcon(baseIcon);
+				that.marker_types[subtype].image = image;	
 				that.marker_types[subtype].subtype = subtype;	
 				that.marker_types[subtype].type = type;	
 				that.marker_types[subtype].is_addable = is_addable;	
@@ -584,7 +514,6 @@ function ResourceManager(map) {
 		
 	// adding new user added resource to the map
 	this.addResource = function(form) {
-		console.log("this.addResource = function(form) {");
 		if(form) {		 
 			var marker = this.createMarker({username: application.user.username, 
 					point: application.current_point,
@@ -601,9 +530,7 @@ function ResourceManager(map) {
 	}
 	
 	this.createMarker = function(args) {
-		console.log("this.createMarker = function(args) {");		//var marker = new GMarker(args.point, {icon: application.resourceManager.marker_types[args.subtype], title: args.name + ' (' + args.subtype + ')'});	
-		var marker = new google.maps.Marker({position: args.point, icon: application.resourceManager.marker_types[args.subtype], title: args.name + ' (' + args.subtype + ')'});	
-
+		var marker = new GMarker(args.point, {icon: application.resourceManager.marker_types[args.subtype], title: args.name + ' (' + args.subtype + ')'});	
 		marker.lid = (args && args.lid) ? args.lid : null;
 		marker.username = (args && args.username) ? args.username : '';
 		marker.type = (args && args.type) ? args.type : '';
@@ -676,7 +603,6 @@ function ResourceManager(map) {
 	}
 	
 	this.openMarker = function(id) {
-		console.log("this.openMarker = function(id) {");
 		if(this.markers_cluster_id[id] != undefined) {
 			var cluster_id = this.markers_cluster_id[id];
 			application.resourceManager.cluster.triggerClick(cluster_id);
@@ -696,7 +622,6 @@ function ResourceManager(map) {
 	
 	this.blockSearch = 0;
 	this.widgetRunSearch = function(args) {
-		console.log("this.widgetRunSearch = function(args) {");
 		application.panelManager.hideAdvanced();
 		$("#search_widget_button").html('<img src="http://victoriamycommunity.org/images/wait_small_white.gif"/>');
 		$("#search_indicator").show();
@@ -762,7 +687,6 @@ function ResourceManager(map) {
 	
 	
 	this.loadMarkers = function(args) {			
-		console.log("this.loadMarkers = function(args) {			");
 	
 		/*var defaults = {  
 			active_load: 0,
@@ -819,10 +743,7 @@ function ResourceManager(map) {
 				
 				$.each(data.markers, function(i, marker_args) {	
 					results_found = i + 1;
-					console.log(marker_args);
-					//marker_args.point = new GLatLng(parseFloat(marker_args.lat),parseFloat(marker_args.lng));
-					marker_args.point = new google.maps.LatLng(parseFloat(marker_args.lat),parseFloat(marker_args.lng));
-
+					marker_args.point = new GLatLng(parseFloat(marker_args.lat),parseFloat(marker_args.lng));
 					last_id = marker_args.lid; // to be able to open exact match listing
 					
 					// create the marker
@@ -847,7 +768,6 @@ function ResourceManager(map) {
 						
 					results_text += '<div class="main_results" style="padding: 0.4em 0.6em;"><div style="margin: 4px 0px;  border-top: 1px dotted;"><a href="#" onclick="application.resourceManager.openMarker(' + marker_args.lid + '); application.panelManager.hideResults(); return(false);">' + marker_args.name + '</a> &nbsp; (<a class="tag_link" href="#" title="Show all listings of category \'' + marker_args.subtype_name + '\' in the current map area." onclick="application.resourceManager.widgetRunSearch({text:\'' + marker_args.subtype_name + '\'});return false;">' + marker_args.subtype_name + '</a>)</div><div class="subtle_text" style="font-size: 0.9em;"> ' + desc_short + address_text + phone_text + '</div><div class="subtle_text" style="font-size: 0.9em; margin-top:0.2em;">' + full_tag_text + '</div></div>';
 					new_markers[i] = marker;
-			google.maps.event.addListener(marker, 'click', marker.openInformationWindow);
 					
 					that.markers[marker_args.lid] = marker;
 					that.markers_cluster_id[marker_args.lid] = i;
@@ -863,8 +783,8 @@ function ResourceManager(map) {
 				else {
 					$("#searchPanelResultsListings").html(results_text);
 					$("#searchPanelResultsFound").html('<b><span style="font-size: 1.2em;">' + results_found + '</span> results found </b>');
-					application.resourceManager.cluster.addMarkers(new_markers);					
-					//application.resourceManager.cluster.refresh();		
+					application.resourceManager.cluster.addMarkers(new_markers);
+					application.resourceManager.cluster.refresh();		
 					application.panelManager.hideNoResults();
 					
 					application.panelManager.feedsCustomize();				
@@ -878,10 +798,9 @@ function ResourceManager(map) {
 
 				}
 				$('#map_filter_center').animate( { backgroundColor: "#FFDE40" }, { queue:true, duration:200 } ).animate( { backgroundColor: application.panelManager.search_bg_color }, { queue:true, duration:1000 } );
-				//map.enableDragging(); // toV3it
+				map.enableDragging();
 				
 				that.markerTip = function() {
-					console.log("that.markerTip = function() {");
 					$("img[id^='mtgt']").qtip({
 								position: {
 									corner: {
@@ -939,25 +858,21 @@ function ResourceManager(map) {
 	}
 	
 	this.clearAllMarkers = function() {
-		console.log("this.clearAllMarkers = function() {");
 		this.markers = [];
 		this.markers_cluster_id = [];
-		this.cluster.removeMarkers(this.markers);
-		//map.clearOverlays(); // toV3it
+		this.cluster.removeMarkers();
+		map.clearOverlays();
 	}
 	
 	this.drag_timer = null;
 	this.endMapDrag = function() {
-		console.log("this.endMapDrag = function() {");
 			clearTimeout(that.drag_timer);
 			that.drag_timer = setTimeout("application.resourceManager.triggerDragLoad()", 1000);
 	}
 	this.startMapDrag = function() {
-		console.log("this.startMapDrag = function() {");
 			clearTimeout(that.drag_timer);
 	}
 	this.triggerDragLoad = function() {
-		console.log("this.triggerDragLoad = function() {");
 		if(!this.blockSearch) {
 			$('#search_text').autocomplete("flushCache");
 			map.disableDragging();
@@ -965,32 +880,24 @@ function ResourceManager(map) {
 		}
 	}
 	
-	//GEvent.bind(map, "dragend", this, this.endMapDrag); // toV3it
-	//GEvent.bind(map, "dragstart", this, this.startMapDrag); // toV3it
-	google.maps.event.addListener(map, 'dragend', this.endMapDrag);
-	google.maps.event.addListener(map, 'dragstart', this.startMapDrag);
-
+	GEvent.bind(map, "dragend", this, this.endMapDrag);
+	GEvent.bind(map, "dragstart", this, this.startMapDrag);
 	
 	this.infoWindowOpened = function() {
-		console.log("this.infoWindowOpened = function() {");
 		this.blockSearch = 1;
 	}
 	this.infoWindowClosed = function() {
-		console.log("this.infoWindowClosed = function() {");
 		this.blockSearch = 0;
 		that.widgetRunSearch({ callback: function() {map.enableDragging();} });
 	}
-	//GEvent.bind(map, "infowindowopen", this, this.infoWindowOpened);// toV3it
-	//GEvent.bind(map, "infowindowbeforeclose", this, this.infoWindowClosed);// toV3it
-	google.maps.event.addListener(map, "infowindowopen", this.infoWindowOpened);
-	google.maps.event.addListener(map, "infowindowbeforeclose", this.infoWindowClosed);
+	GEvent.bind(map, "infowindowopen", this, this.infoWindowOpened);
+	GEvent.bind(map, "infowindowbeforeclose", this, this.infoWindowClosed);
 
 
 	
 	/////////////////////////////////////////////
 
 	this.yVIHLookup = function(response) {
-		console.log("this.yVIHLookup = function(response) {");
 			//map.clearOverlays();
 		  if (!response || response.Status.code != 200) {
 				alert("Status Code:" + response.Status.code);
@@ -1007,7 +914,6 @@ function ResourceManager(map) {
 	}
 	
 	this.YVIHPopup = function() {	
-		console.log("this.YVIHPopup = function() {	");
 		var point = application.current_point;
 		geocoder.getLocations(point, this.yVIHLookup);
 	}
@@ -1016,11 +922,9 @@ function ResourceManager(map) {
 			
 
 function PanelManager(map) {
-	console.log("function PanelManager(map) {");
 	var that = this;
 		
 	this.autoFill = function(id, v){
-		console.log("this.autoFill = function(id, v){");
 		$(id).css({ color: "#b2adad" }).attr({ value: v }).focus(function(){
 			if($(this).val()==v){
 				$(this).val("").css({ color: "#333" });
@@ -1195,8 +1099,7 @@ function PanelManager(map) {
 
 	var resizeTimer = null;
 	this.setHeaderSize = function() {
-		console.log("this.setHeaderSize");
-		var map_size = map.getDiv(); 
+		var map_size = map.getSize(); 
 		var x_size = map_size.width;
 		var y_size = map_size.height;
 
@@ -1228,19 +1131,16 @@ function PanelManager(map) {
 		$("#search_subtype_checkboxes").css("height", y_size - 100);
 	}
 	$(window).bind('resize', function(that) {
-		console.log("$(window).bind('resize', function(that) {");
 		if (resizeTimer) clearTimeout(resizeTimer);
     	resizeTimer = setTimeout("application.panelManager.setHeaderSize()", 100);
 	}); 
 	
 	
 	this.login = function(form) {
-		console.log("this.login = function(form) {");
 		$("#login_response").html('<img src="images/wait_small.gif"/>');
 		application.user.login(form, this.loginSuccess, this.loginFailure);
 	}
 	this.loginSuccess = function(name, last_lng, last_lat, last_zoom) {
-		console.log("this.loginSuccess = function(name, last_lng, last_lat, last_zoom) {");
 		$("#login_response").html('<div class="ui-widget"><div class="ui-state-highlight ui-corner-all" style="padding: 0pt 0.7em; margin-top: 20px;"> <p><span class="ui-icon ui-icon-check" style="float: left; margin-right: 0.3em;"></span><b>Hi! You\'re logged in as ' + name + '</b></p></div></div>');									 
 		that.openInboxWindow(1);
 		$(".show_logged_in").css("display", "block");
@@ -1249,7 +1149,6 @@ function PanelManager(map) {
 		//map.setCenter(new GLatLng(last_lat, last_lng), 15);
 	}
 	this.loginFailure = function(error_message) {
-		console.log("this.loginFailure = function(error_message) {");
 		$("#login_response").html('<div class="ui-widget"><div class="ui-state-error ui-corner-all" style="padding: 0pt 0.7em; margin-top: 20px;"> <p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: 0.3em;"></span><b>' + error_message + '</b></p></div></div>');									 
 		that.openLoginWindow();
 		$(".show_logged_in").css("display", "none");
@@ -1258,12 +1157,10 @@ function PanelManager(map) {
 
 	
 	this.logOut = function(form) {
-		console.log("this.logOut = function(form) {");
 		application.user.logout(this.logoutSuccess);
 		return(false);
 	}
 	this.logoutSuccess = function() {	
-		console.log("this.logoutSuccess = function() {	");
 		that.openHomeWindow();
 		$(".show_logged_in").css("display", "none");
 		$(".show_logged_out").css("display", "block");
@@ -1274,28 +1171,23 @@ function PanelManager(map) {
 	});
 	
 	this.register = function(form) {
-		console.log("this.register = function(form) {");
 		$("#register_response").html('<img src="images/wait_small.gif"/>');
 		application.user.register(form, this.registerSuccess, this.registerFailure); 
 	}	
 	this.registerSuccess = function() {	
-		console.log("this.registerSuccess = function() {	");
 		$("#register_response").html('<b style="color: green"><img src="images/tick.jpeg" /> Great! We\'ve just sent you an email to confirm your email address, just click on the link in this email to complete sign up.</b>');			
 		$(".register_step_2").css("display", "table-row");	
 		$(".register_step_1").css("display","none");
 	}
 	this.registerFailure = function(error_message) {
-		console.log("this.registerFailure = function(error_message) {");
 		$("#register_response").html('<b style="color: red"><img src="images/cross.jpeg" />' + error_message + '</b>');
 	}
 	
 	this.registerConfirm = function(form) {
-		console.log("this.registerConfirm = function(form) {");
 		$("#register_response").html('<img src="images/wait_small.gif"/>');
 		application.user.registerConfirm(form, this.registerConfirmSuccess, this.registerConfirmFailure); 
 	}	
 	this.registerConfirmSuccess = function(name) {	
-		console.log("this.registerConfirmSuccess = function(name) {	");
 		$("#register_response").html('<b style="color: green"><img src="images/tick.jpeg" /> Hi! Youre logged in as ' +  name + '!</b>');			
 		$("#login_response").html('<b style="color: green"><img src="images/tick.jpeg" /> Hi! Youre logged in as ' +  name + '!</b>');			
 		$(".register_step_2").css("display", "none");	
@@ -1306,17 +1198,14 @@ function PanelManager(map) {
 		that.openInboxWindow(1);
 	}
 	this.registerConfirmFailure = function(error_message) {
-		console.log("this.registerConfirmFailure = function(error_message) {");
 		$("#register_response").html('<b style="color: red"><img src="images/cross.jpeg" />' + error_message + '</b>');
 	}
 	
 	this.inviteConfirm = function(form) {
-		console.log("this.inviteConfirm = function(form) {");
 		$("#register_response").html('<img src="images/wait_small.gif"/>');
 		application.user.inviteConfirm(form, this.inviteConfirmSuccess, this.inviteConfirmFailure); 
 	}	
 	this.inviteConfirmSuccess = function(name) {	
-		console.log("this.inviteConfirmSuccess = function(name) {	");
 		$("#register_response").html('<b style="color: green"><img src="images/tick.jpeg" /> Hi! Youre logged in as ' +  name + '!</b>');			
 		$("#login_response").html('<b style="color: green"><img src="images/tick.jpeg" /> Hi! Youre logged in as ' +  name + '!</b>');			
 		$(".register_step_2").css("display", "none");	
@@ -1327,14 +1216,12 @@ function PanelManager(map) {
 		that.openInboxWindow();
 	}
 	this.inviteConfirmFailure = function(error_message) {
-		console.log("this.inviteConfirmFailure = function(error_message) {");
 		$("#register_response").html('<b style="color: red"><img src="images/cross.jpeg" />' + error_message + '</b>');
 	}
 	
 	////////////////////////////////////////////////////////////////////////////	
 	
 	this.loadProfile = function(username) {
-		console.log("this.loadProfile = function(username) {");
 		$.get('data/get_profile.php', {username: username}, function(data) {
 			$('#pp_username').text(username);
 			$('#pp_full_name').text($(data).find('full_name').text());
@@ -1347,8 +1234,8 @@ function PanelManager(map) {
 				
 				$.each(data.markers, function(i, marker_args) {	
 					results_found = i + 1;
-					//marker_args.point = new GLatLng(parseFloat(marker_args.lat),parseFloat(marker_args.lng));
-					marker_args.point = new google.maps.LatLng(parseFloat(marker_args.lat),parseFloat(marker_args.lng));
+					marker_args.point = new GLatLng(parseFloat(marker_args.lat),parseFloat(marker_args.lng));
+				
 					var name = marker_args.name;
 					var lid = marker_args.lid;
 					var desc = marker_args.desc;
@@ -1367,7 +1254,6 @@ function PanelManager(map) {
 	////////////////////////////////////////////////////////////////////////////	
 	
 	this.openPanel = function(panelId) {
-		console.log("this.openPanel = function(panelId) {");
 		$("#panel_background").animate( { opacity:"1" }, 500).fadeIn("slow", function(){
 			$(".content_pane").css("display", "none");
 			$("#panel").fadeIn("slow");
@@ -1383,7 +1269,6 @@ function PanelManager(map) {
 		});	
 	}
 	this.closeAllPanels = function() {
-		console.log("this.closeAllPanels = function() {");
 		$("#panel").fadeOut("fast", function() { 
 				$("#panel_background").fadeOut("slow", function () {
 						$("#map_zoom_div").fadeIn("slow");
@@ -1402,7 +1287,6 @@ function PanelManager(map) {
 	});
 	
 	this.openHomeWindow = function() {
-		console.log("this.openHomeWindow = function() {");
 		this.openPanel("#panel_home");
 	}
 	$("#homeButton").bind("click", function() {		
@@ -1410,7 +1294,6 @@ function PanelManager(map) {
 	});
 	
 	this.openLoginWindow = function() {
-		console.log("this.openLoginWindow = function() {");
 			this.openPanel("#panel_login");
 	}		
 	$(".loginButton").bind("click", function() {		
@@ -1418,7 +1301,6 @@ function PanelManager(map) {
 	});
 	
 	this.openInboxWindow = function(refresh) {
-		console.log("this.openInboxWindow = function(refresh) {");
 			this.openPanel("#panel_inbox");	
 			if(refresh) {
 				application.user.refreshInboxRss();
@@ -1431,7 +1313,6 @@ function PanelManager(map) {
 	});
 	
 	this.openDocsWindow = function(url) {			
-		console.log("this.openDocsWindow = function(url) {			");
 			that.openPanel("#panel_docs");
 	}	
 	$("#docsButton").bind("click", function() {		
@@ -1439,7 +1320,6 @@ function PanelManager(map) {
 	});
 	
 	this.openProfileWindow = function(username) {
-		console.log("this.openProfileWindow = function(username) {");
 			this.openPanel("#panel_profile");
 			this.loadProfile(username);
 	}		
@@ -1450,7 +1330,6 @@ function PanelManager(map) {
 
 	
 	this.clickMap = function(point) {
-		console.log("this.clickMap = function(point) {");
 		if(point) {application.onMapClick(null, point);}
 		else {application.onMapClick(null, map.getCenter());}
 	}
@@ -1460,9 +1339,7 @@ function PanelManager(map) {
 			this.openPanel("#panel_yvih");	
 	}	*/
 	this.gotoAddress = function(address, callback) {
-		console.log("this.gotoAddress = function(address, callback) {");
 		if (geocoder) {
-			/*
 			geocoder.getLatLng(address, function(point) {
 				if (!point) {
 					alert(address + " not found");
@@ -1472,22 +1349,10 @@ function PanelManager(map) {
 					that.closeAllPanels();
 					if(typeof(callback) == 'function') { callback(point); }
 				}
-			});*/
- 			geocoder.geocode( { 'address': address}, function(results, status) {
-				if (status == google.maps.GeocoderStatus.OK) {
-					var point = results[0].geometry.location;
-					map.setCenter(point, 14);		
-					that.closeAllPanels();
-					if(typeof(callback) == 'function') { callback(point); }
-				} else {
-					alert(address + " not found");
-				}
 			});
-
 		}
 	}	
 	this.widgetPluginCustomize = function() {
-		console.log("this.widgetPluginCustomize = function() {");
 		var start_screen = $("#widget_plugin_form select[name=start_screen] option:selected").val();
 		var theme = $("#widget_plugin_form select[name=theme] option:selected").val();
 		var size = $("#widget_plugin_form select[name=size] option:selected").val();
@@ -1522,7 +1387,6 @@ function PanelManager(map) {
 		$('#wpf_code').attr({value: '<iframe style="border: none; width:' + x + 'px; height:' + y + 'px;" src="www.victoriamycommunity.org/index.php' + settings + '"></iframe>'});
 	}
 	this.feedsCustomize = function() {
-		console.log("this.feedsCustomize = function() {");
 		var Bounds = map.getBounds();
 		var NorthEast = Bounds.getNorthEast();
 		var SouthWest = Bounds.getSouthWest();
@@ -1544,7 +1408,6 @@ function PanelManager(map) {
 	// Map Filter / Search Bar
 	this.show_results_timer = null;
 	this.showResults = function() {
-		console.log("this.showResults = function() {");
 		$('#searchPanelResults').slideDown('normal');
 		$('#show_results_button').html("<b>Hide Results</b>");
 		$('#show_results_button').unbind('click', that.showResults).click(that.hideResults);
@@ -1552,28 +1415,24 @@ function PanelManager(map) {
 		that.hideNoResults();
 	}
 	this.hideResults = function() {
-		console.log("this.hideResults = function() {");
 		$('#searchPanelResults').slideUp('normal');
 		$('#show_results_button').html("<b>Show Results</b>");
 		$('#show_results_button').unbind('click', that.hideResults).click(that.showResults);
 	}
 	$("#map_div").mouseenter(
-		function () {console.log("$('#map_div').mouseenter(");that.hideResults();}
+		function () {that.hideResults();}
 	);
 	this.showNoResults = function() {
-		console.log("this.showNoResults = function() {");
 		$('#searchPanelNoResults').slideDown('normal');
 		$('#show_results_button').hide();
 		that.hideResults();
 		that.hideAdvanced();
 	}
 	this.hideNoResults = function() {
-		console.log("this.hideNoResults = function() {");
 		$('#searchPanelNoResults').slideUp('normal');
 		$('#show_results_button').show();
 	}
 	this.showAdvanced = function() {
-		console.log("this.showAdvanced = function() {");
 		$('#search_subtype_checkboxes').slideDown('normal');
 		$('#advanced_button').html("Hide Advanced");
 		$('#advanced_button').unbind('click', that.showAdvanced).click(that.hideAdvanced);
@@ -1581,13 +1440,11 @@ function PanelManager(map) {
 		that.hideNoResults();
 	}
 	this.hideAdvanced = function() {
-		console.log("this.hideAdvanced = function() {");
 		$('#search_subtype_checkboxes').slideUp('normal');
 		$('#advanced_button').html("Advanced");
 		$('#advanced_button').unbind('click', that.hideAdvanced).click(that.showAdvanced);
 	}
 	this.flashSearchBox = function() {
-		console.log("this.flashSearchBox = function() {");
 		$('#search_text').animate( { backgroundColor: "#FFDE40" }, { queue:true, duration:200 } )
 										.animate( { backgroundColor: "white" }, { queue:true, duration:1000 } );	
 	}
@@ -1599,7 +1456,6 @@ function PanelManager(map) {
 /////////////////////////////////
 	
 function User(map) {
-	console.log("function User(map) {");
 	//all things user
 	var that = this;
 	
@@ -1608,11 +1464,9 @@ function User(map) {
 	this.full_name = null;
 	 
 	this.isLoggedIn = function() {
-		console.log("this.isLoggedIn = function() {");
 		if (this.username === null) {return false;} else {return true;}
 	}
 	this.refreshIsLoggedIn = function() {
-		console.log("this.refreshIsLoggedIn = function() {");
 			$.post('data/is_logged_in.php', {}, function(data) {
 				if($(data).find("response_state").attr("success") == 'true') {
 					that.email = $(data).find("user").attr("email");
@@ -1630,7 +1484,6 @@ function User(map) {
 	this.refreshIsLoggedIn();
 	 
 	this.logout = function(doOnSuccess) {
-		console.log("this.logout = function(doOnSuccess) {");
 		$.post('data/logout.php', {}, function(data) {
 				$("#register_wait").css("display", "none");
 				if($(data).find("response_state").attr("success") == 'true') {
@@ -1642,14 +1495,12 @@ function User(map) {
 	}	
 	
 	this.clearUser = function() {
-		console.log("this.clearUser = function() {");
 		this.username = null;
 		this.email = null;
 		this.full_name = null;
 	}
 	
 	this.login = function(form, doOnSuccess, doOnFailure) {			
-		console.log("this.login = function(form, doOnSuccess, doOnFailure) {			");
 		var email_or_username = form.email.value;
 		var password = form.password.value;
 			 
@@ -1678,7 +1529,6 @@ function User(map) {
 	}
 	   
 	this.register = function(form, doOnSuccess, doOnFailure) {					 
-		console.log("this.register = function(form, doOnSuccess, doOnFailure) {					 ");
 		var email = form.email.value;
 		var password = form.password.value;
 		var full_name = form.full_name.value;
@@ -1707,7 +1557,6 @@ function User(map) {
 	}
 	   
 	this.registerConfirm = function(form, doOnSuccess, doOnFailure) {				
-		console.log("this.registerConfirm = function(form, doOnSuccess, doOnFailure) {				");
 		document.getElementById('login_response').innerHTML = '<img src="images/wait_small.gif"/>';	 
 		var email = form.email.value;
 		var rego_code = form.rego_code.value;
@@ -1733,7 +1582,6 @@ function User(map) {
 	}
 	
 	this.inviteConfirm = function(form, doOnSuccess, doOnFailure) {					 
-		console.log("this.inviteConfirm = function(form, doOnSuccess, doOnFailure) {					 ");
 		var email = form.email.value;
 		var password = form.password_invite.value;
 		var full_name = form.full_name_invite.value;
@@ -1763,7 +1611,6 @@ function User(map) {
 	}
 	   
 	this.conversationReply = function(conv_id, reply) {
-		console.log("this.conversationReply = function(conv_id, reply) {");
 		$("#conversation_reply_button").html('<image id="conversation_reply_wait" src="images/wait_small_white.gif"/>');
 		$.post('data/add_conversation_message.php', {conversation_id: conv_id, message: reply}, function(data) {
 			that.refreshConversation(conv_id);
@@ -1771,7 +1618,6 @@ function User(map) {
 	}
 
 	this.conversationNew = function(usernames_or_email, title, message) {
-		console.log("this.conversationNew = function(usernames_or_email, title, message) {");
 		$('#inbox_tabs').tabs( 'select' , 0 );
 		$("#conversation_reply_wait").css("display", "inline");
 		$.post('data/add_conversation.php', {users: usernames_or_email, title: title, message: message}, function(data) {
@@ -1780,7 +1626,6 @@ function User(map) {
 	}
 	
 	this.conversationDelete = function(form) {
-		console.log("this.conversationDelete = function(form) {");
 		var conversation_ids = '';
 		for (i=0; i<form.conversation_id.length; i++) {
 			if (form.conversation_id[i].checked==true) {
@@ -1793,12 +1638,10 @@ function User(map) {
 	}
 	
 	this.rssAdd = function(url) {
-		console.log("this.rssAdd = function(url) {");
 		$.post('data/add_rss.php', {rss: url});
 	}
 	
 	this.refreshConversation = function(conv_id) {
-		console.log("this.refreshConversation = function(conv_id) {");
 		$('#inbox_tabs').tabs( 'select' , 0 );
 		if(this.isLoggedIn()) {
 			$("#message-inbox").hide("fast", function() { 
@@ -1822,7 +1665,6 @@ function User(map) {
 	
 	
 	this.refreshConversationNew = function(contact_details, type) {
-		console.log("this.refreshConversationNew = function(contact_details, type) {");
 		$('#inbox_tabs').tabs( 'select' , 0 );
 		if(type == 'email' || type == 'username') {
 			$("#inbox_conversations").html('<h2 style="margin-left: 155px;">New Conversation</h2><p style="margin-left: 155px;">Between YOU and User ' + contact_details + '</p><hr><div id="conversation_reply" style="margin-left:155px;"><form action="#" name="replyform"><input name="title" style="width:400px;"/><br><textarea name="message" style="width:400px; height:100px;"></textarea><br><input type="button" value="Send" class="button" onclick="application.user.conversationNew(\'' + contact_details + '\', this.form.title.value, this.form.message.value);"><image style="margin: 4px; display:none;" id="conversation_reply_wait" src="images/wait_small.gif"/></form></div> ');
@@ -1835,7 +1677,6 @@ function User(map) {
 	}
 	
 	this.refreshInboxConversations = function() {
-		console.log("this.refreshInboxConversations = function() {");
 		if(this.isLoggedIn()) {
 			$("#message-edit").hide("fast", function() { 
 				$("#message-inbox").slideDown("fast");
@@ -1859,7 +1700,6 @@ function User(map) {
 	}
 	
 	this.refreshInboxRss = function() {
-		console.log("this.refreshInboxRss = function() {");
 		/*if(this.isLoggedIn()) {
 			$("#news_wait").css("display", "inline");
 			$.post('data/get_inbox_rss.php', {}, function(data) {
@@ -1890,7 +1730,6 @@ function User(map) {
 	} 	
 	
 	this.refreshInboxMarkers = function() {
-		console.log("this.refreshInboxMarkers = function() {");
 		if(this.isLoggedIn()) {
 			$("#resources_wait").css("display", "inline");
 			$.getJSON('data/get_markers.php', {format:"json", username: this.username}, function(data) {
@@ -1925,22 +1764,15 @@ function User(map) {
 			 
 			
 function AGCApp() {
-	console.log("function AGCApp() {");
 
 	this.current_point = 'NULL';
 	
 	//create and setup map
-	//map = new GMap2(document.getElementById("map_div"));
-	var mapOptions = {
-		zoom: 14,
-		center: new google.maps.LatLng(0,0),
-		mapTypeId: google.maps.MapTypeId.ROADMAP
-	};
-	map = new google.maps.Map(document.getElementById('map_div'), mapOptions);
-	//map.setCenter(new GLatLng(0, 0), 3);  // set to 0 as load_params in app.html will set with url params
+	map = new GMap2(document.getElementById("map_div"));
+	map.setCenter(new GLatLng(0, 0), 3);  // set to 0 as load_params in app.html will set with url params
+
 	//bind map clicks to map click controller	
-	//GEvent.bind(map, "click", this, this.onMapClick);
-	google.maps.event.addListener(map, 'click', this.onMapClick);
+	GEvent.bind(map, "click", this, this.onMapClick);
 	
 	this.user = new User(map);
 	this.resourceManager = new ResourceManager(map);
@@ -1958,7 +1790,6 @@ function AGCApp() {
 
 
 AGCApp.prototype.onMapClick = function(overlay, point) {
-	console.log("AGCApp.prototype.onMapClick = function(overlay, point) {");
 	//If Icon clicked, display its basic info...						
 	if (overlay && overlay.type) {
 			this.resourceManager.current_marker = overlay;
@@ -2027,7 +1858,6 @@ AGCApp.prototype.onMapClick = function(overlay, point) {
 
 
 function stopRKey(evt) {
-	console.log("function stopRKey(evt) {");
 	var evt = (evt) ? evt : ((event) ? event : null);
 	var node = (evt.target) ? evt.target : ((evt.srcElement) ? evt.srcElement : null);
 	if ((evt.keyCode == 13) && (node.type=="text")) {return false;}
@@ -2036,14 +1866,12 @@ function stopRKey(evt) {
 var application; //set as global through load func
 
 var load = function load() {
-	console.log("var load = function load() {");
 	//<![CDATA[
-	if (true || GBrowserIsCompatible()) {
+	if (GBrowserIsCompatible()) {
 			// set as global
 			application = new AGCApp();	
 			// init geocoder for use by the showAddress function...
-			//this.geocoder = new GClientGeocoder();	
-			this.geocoder = new google.maps.Geocoder();
+			this.geocoder = new GClientGeocoder();	
 			
 			//document.onkeypress = stopRKey;
 
