@@ -101,7 +101,7 @@
 			var west_lng = SouthWest.lng();	
 			
 			var filter_text = $("#txtSearch").val();
-			var filter_subtype = "";
+			var filter_subtype = $("#ddlSearch").val();
 			var username = "";
 			var lid = "";
 			$("#listItems").prepend("Loading items...")
@@ -180,6 +180,25 @@
 		}
 		// dragging/zooming auto refresh functions - 0
 		
+		
+		function loadCategories(){
+			var restrict_subtype = '';
+			$.get('http://communityfinder.net/data/get_subtypes.php',{restrict_subtype: restrict_subtype}, function(data) {
+				$("#ddlSearch").html("");
+				$("#ddlSearch").append(jQuery("<option>").attr("value", "").html("-- Any --"));
+				$(data).find('icon').each(function(i) {	
+					var subtype = $(this).attr('subtype');
+					var type = $(this).attr('type');
+					var is_addable = $(this).attr('is_addable');
+					var image = $(this).attr("image");
+					var subtype_name = $(this).attr("subtype_name");
+					var type_name = $(this).attr("type_name");
+					var prefixes = ($(this).attr("prefixes")) ? ($(this).attr("prefixes")).split(',') : null;
+					var prefixes_help = $(this).attr("prefixes_help");
+					$("#ddlSearch").append(jQuery("<option>").attr("value", subtype).html(subtype_name));
+				});
+			});
+		}
 		$(document).ready(function () {
 
 			// item details page - 1
@@ -218,6 +237,7 @@
 					mapLocation(position);
 				});
 			});
+			loadCategories();
 			// search - 0
 			
 			// filter - 1
@@ -259,7 +279,10 @@
 			<input id="btnMyLocation" type="button" value="Near Me">
 
 			<div id="map_canvas" style="height: 300px; width: 100%"></div>
-			Step 2: Add filter <input id="txtSearch" type="text"><input id="btnSearch" type="button" value="Search Location">
+			Step 2: Add filter 
+			<input id="txtSearch" type="text">
+			<select id="ddlSearch"></select>
+			<input id="btnSearch" type="button" value="Search Location">
 
 			<ul id='listItems'>
 			</ul>
