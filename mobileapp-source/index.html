@@ -46,11 +46,13 @@
 
 	var DEFAULT_LOCATION = new google.maps.LatLng(-37.820724999999996,145.03867549999998);
 	var DEFAULT_ZOOM = 15;
+	var MAP_ID = "#map_canvas";
+	var drag_timer;
 		
 		// draw map centred on location. retrieve results
 		function mapLocation(location){
-			$('#map_canvas').gmap('option', 'center', location);
-			$('#map_canvas').gmap('option', 'zoom', DEFAULT_ZOOM);
+			$(MAP_ID).gmap('option', 'center', location);
+			$(MAP_ID).gmap('option', 'zoom', DEFAULT_ZOOM);
 			loadMarkers(location);
 		}
 		
@@ -86,7 +88,7 @@
 		// does the search based on a location
 		// calls backend API
 		function loadMarkers(location){
-			var map = $('#map_canvas').gmap('get', 'map'); 
+			var map = $(MAP_ID).gmap('get', 'map'); 
 			var Bounds = map.getBounds();
 			var NorthEast = Bounds.getNorthEast();
 			var SouthWest = Bounds.getSouthWest();
@@ -99,8 +101,7 @@
 			var filter_subtype = "";
 			var username = "";
 			var lid = "";
-			$('#map_canvas').gmap('clear', 'markers');
-			$("#listItems").html("Loading items...")
+			$("#listItems").prepend("Loading items...")
 
 			/*
 				JSON call
@@ -118,7 +119,8 @@
 			
 			$.getJSON('http://communityfinder.net/data/get_markers.php', {format:"json",north_lat:north_lat, east_lng:east_lng, south_lat:south_lat, west_lng:west_lng, filter_text: filter_text, filter_subtype: filter_subtype, username:username, listing_id: lid}, function(data) {
 				$("#listItems").html("");
-				
+				$(MAP_ID).gmap('clear', 'markers');
+
 				/*
 				http://jquery-ui-map.googlecode.com/svn/trunk/demos/jquery-google-maps-data-attribute.html
 				format of LI
@@ -142,7 +144,7 @@
 
 		// load markers based on current centre (used when center is not known. e.g. on dragend)
 		function loadMarkersRefresh(){
-			loadMarkers($('#map_canvas').gmap('option', 'center'));
+			loadMarkers($(MAP_ID).gmap('option', 'center'));
 		}
 		
 		// reads meta-data in LI node and display on map
@@ -150,7 +152,7 @@
 		function loadMarkersFromList(){
 			$("[data-gmapping]").each(function(i,el) {
 				var data = $(el).data('gmapping');
-				$('#map_canvas').gmap('addMarker', {
+				$(MAP_ID).gmap('addMarker', {
 						'id': data.id, 
 						'tags':data.tags, 
 						'position': new google.maps.LatLng(data.latlng.lat, data.latlng.lng), 
@@ -160,10 +162,20 @@
 						$(marker).triggerEvent('click');
 					});
 				}).click(function() {
-					$('#map_canvas').gmap('openInfoWindow', { 'content': $(el).find('.info-box').html() }, this);
+					$(MAP_ID).gmap('openInfoWindow', { 'content': $(el).find('.info-box').html() }, this);
 				});
 			});		
 		}
+
+		// dragging/zooming auto refresh functions - 1
+		function resetTimer(){
+			clearTimeout(drag_timer);
+		}
+		function setTimer(time){
+			resetTimer();
+			drag_timer = setTimeout(function(){ loadMarkers($(MAP_ID).gmap('option', 'center')); }, (time ? time : 1000));
+		}
+		// dragging/zooming auto refresh functions - 0
 		
 		$(document).ready(function () {
 
@@ -191,7 +203,7 @@
 				findLocationByName($("#txtLocation").val());
 			});
 			$("#btnMyLocation").click(function(e){
-				$('#map_canvas').gmap('getCurrentPosition', function(position, status) {
+				$(MAP_ID).gmap('getCurrentPosition', function(position, status) {
 					var position;
 					if ( status === 'OK' ) {
 						e.preventDefault();
@@ -207,24 +219,21 @@
 			
 			// filter - 1
 			$("#btnSearch").click(function(e){
-				var map = $('#map_canvas').gmap('get', 'center'); 
-				loadMarkers($('#map_canvas').gmap('option', 'center'));
+				loadMarkers($(MAP_ID).gmap('option', 'center'));
 			});
 			// filter - 0
 
 			
 			// init map - 1
-			$('#map_canvas').gmap({'center': DEFAULT_LOCATION, 'zoom': DEFAULT_ZOOM}).bind('init', function(evt, map) {
-				loadMarkersRefresh();
-				
+			$(MAP_ID).gmap({'center': DEFAULT_LOCATION, 'zoom': DEFAULT_ZOOM}).bind('init', function(evt, map) {
+				setTimer(1);
 				// drag map. load search after 1 second after drag ends
-				var drag_timer;
 				$(map).dragend(function(){
-					clearTimeout(drag_timer);
-					drag_timer = setTimeout("loadMarkersRefresh()", 1000);
-				});
-				$(map).drag(function(){
-					clearTimeout(drag_timer);
+					setTimer();
+				}).drag(function(){
+					resetTimer();
+				}).addEventListener('zoom_changed', function(){
+					setTimer();
 				});
 			});
 			// init map - 0
