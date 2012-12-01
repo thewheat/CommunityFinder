@@ -40,12 +40,11 @@
 		*/
 		
 		
-		// draw map centred on location
+		// draw map centred on location. retrieve results
 		function mapLocation(location){
-			console.log(location);
-			console.log(location.lat());
-			console.log(location.lng());
-			//$('#map_canvas').gmap({'centre': location.lat() + '' + location.lng()});
+			$('#map_canvas').gmap('option', 'center', location);
+			$('#map_canvas').gmap('option', 'zoom', 15);
+			loadMarkers(location);
 		}
 		function findLocationByName(address){
 			// https://developers.google.com/maps/documentation/geocoding/
@@ -55,7 +54,6 @@
 					case google.maps.GeocoderStatus.OK:
 						var location = results[0];
 						console.log(location.formatted_address);
-						console.log(location.geometry.location);
 						mapLocation(location.geometry.location);
 						return;
 					case google.maps.GeocoderStatus.ZERO_RESULTS:
@@ -76,6 +74,60 @@
 				}
 			});
 		}
+		function loadMarkers(location){
+			var map = $('#map_canvas').gmap('get', 'map'); 
+			var Bounds = map.getBounds();
+			var NorthEast = Bounds.getNorthEast();
+			var SouthWest = Bounds.getSouthWest();
+			var north_lat = NorthEast.lat();
+			var east_lng = NorthEast.lng();
+			var south_lat = SouthWest.lat();
+			var west_lng = SouthWest.lng();	
+			
+			var filter_text = $("#txtSearch").val();
+			var filter_subtype = "";
+			var username = "";
+			var lid = "";
+			$('#map_canvas').gmap('clear', 'markers');
+
+			$.getJSON('../../webapp-source/data/get_markers.php', {format:"json",north_lat:north_lat, east_lng:east_lng, south_lat:south_lat, west_lng:west_lng, filter_text: filter_text, filter_subtype: filter_subtype, username:username, listing_id: lid}, function(data) {
+				$("#listItems").html("");
+				if(!data.markers || data.markers.length == 0){
+					$("#listItems").append(jQuery("<li>").append(jQuery("<p>").val("No results found").addClass("info-box")));
+				}
+				else{
+					for(var i = 0; i < data.markers.length; i++){
+						var m = data.markers[i];
+						var m_data = {id: m.lid, latlng: {lat: m.lat, lng: m.lng} };
+						$("#listItems").append(jQuery("<li>").attr("data-gmapping", JSON.stringify(m_data)).append(jQuery("<p>").html(m.desc).addClass("info-box")));
+					}
+				}
+				
+				
+				loadMarksFromHTMLList();
+			});
+	/*
+						<li data-gmapping='{"id":"m_1","latlng":{"lat":27.6648274,"lng":-81.51575350000002},"tags":"drupal"}'>
+							<p class="info-box">Florida DrupalCamp - Feb 11 2012</p>
+						</li>
+	
+				http://localhost/communityfinder/webapp-source/data/get_markers.php?
+					format=json&
+					north_lat=-35.59478566548724&
+					east_lng=149.1119384765625&
+					south_lat=-38.47079371120379&
+					west_lng=142.0806884765625&
+					filter_text=farm&
+					filter_subtype=&
+					username=&
+					listing_id=		
+	//*/		
+		}
+			
+		function loadMarksRefresh(){
+			loadMarkers($('#map_canvas').gmap('option', 'center'));
+		}
+		
 		function loadMarkersFromJSON(){
 			$.getJSON( 'demo.json', function(data) { 
 				$.each( data.markers, function(i, marker) {
@@ -114,7 +166,6 @@
 				//loadMarkersFromJSON();
 			});
 			
-			loadMarksFromHTMLList();
 			// specify location - 1
 			$("#btnLocation").click(function(e){
 				e.preventDefault();
@@ -135,6 +186,11 @@
 			});
 			// specify location - 0
 			
+			$("#btnSearch").click(function(e){
+				var map = $('#map_canvas').gmap('get', 'center'); 
+				loadMarkers($('#map_canvas').gmap('option', 'center'));
+			});
+			
 			$('#map_canvas').gmap().bind('init', function(evt, map) {
 				
 				
@@ -142,7 +198,7 @@
 				var drag_timer;
 				$(map).dragend(function(){
 					clearTimeout(drag_timer);
-					drag_timer = setTimeout("loadMarksFromHTMLList()", 1000);
+					drag_timer = setTimeout("loadMarksRefresh()", 1000);
 				});
 				$(map).drag(function(){
 					clearTimeout(drag_timer);
@@ -200,13 +256,13 @@
 	</div><!-- /header -->
 
 	<div data-role="content">	
-		Step 1: Specify location <input id="txtLocation" type="text"><input id="btnLocation" type="button" value="View Location">
+		Step 1: Specify location <input id="txtLocation" type="text" value="brunswick"><input id="btnLocation" type="button" value="View Location">
 		<input id="btnMyLocation" type="button" value="Near Me">
 
 		<div id="map_canvas" style="height: 300px; width: 100%"></div>
 		Step 2: Add filter <input id="txtSearch" type="text"><input id="btnSearch" type="button" value="Search Location">
 
-					<ul>
+					<ul id='listItems'>
 						<li data-gmapping='{"id":"m_1","latlng":{"lat":27.6648274,"lng":-81.51575350000002},"tags":"drupal"}'>
 							<p class="info-box">Florida DrupalCamp - Feb 11 2012</p>
 						</li>
