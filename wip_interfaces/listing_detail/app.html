@@ -21,37 +21,37 @@
         <!-- Home -->
         <div data-role="page" id="page1">
             <div data-role="content">
-                <h2>
-                    Heading
+                <h2 id="name">
+                    Name
                 </h2>
                 <div class="ui-grid-a">
                     <div class="ui-block-a">
-                        <h5>
+                        <h5 id="user">
                             Added by
                         </h5>
                     </div>
-                    <div class="ui-block-b">
-                        <h3>
+                    <div class="ui-block-b" id="type">
+                        <h3 id="type">
                             Category
                         </h3>
                     </div>
                 </div>
-                <h5>
+                <h5 id="address">
                     Street, Suburb, City, Postcode
                 </h5>
-                <div>
+                <div id="phone">
                     <a href="tel:0400200700" target="_blank" data-transition="fade">
                         Phone
                     </a>
                 </div>
-                <div>
+                <div id="www">
                     <a href="google.com" target="_blank" data-transition="fade">
                         Web Site
                     </a>
                 </div>
-                <h5>
+                <span id="description">
                     Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec sed odio dui.
-                </h5>
+                </span>
                 <div>
                     <a href="#" target="_blank" data-transition="fade">
                         Share link
@@ -60,7 +60,20 @@
             </div>
         </div>
         <script>
-            //App custom javascript
+			$.getJSON('http://communityfinder.net/data/get_markers.php?format=json&listing_id=8287', function(data) {
+			console.log(data.markers[0]);
+
+			$('#name').html(data.markers[0].name);
+			$('#description').html(data.markers[0].desc);
+			$('#user').html(data.markers[0].username);
+			$('#type').html(data.markers[0].type);
+			$('#address').html(data.markers[0].address);
+			$('#phone').html(data.markers[0].phone);
+			$('#www').html(data.markers[0].www);
+
+			});
+			
+			
         </script>
     </body>
 </html>
