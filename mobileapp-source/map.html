@@ -3,7 +3,7 @@
 	<title>My Page</title> 
 	<meta name="viewport" content="width=device-width, initial-scale=1"> 
 	<!-- jquery mobile - 1 -->
-	<link rel="stylesheet"  href="css/themes/default/jquery.mobile-1.2.0.css" />
+	<link rel="stylesheet"  href="css/jqm_themes/default/jquery.mobile-1.2.0.css" />
 	<script src="js/jquery.js"></script>
 	<script src="js/jquery.mobile-1.2.0.min.js"></script>
 	<!-- jquery mobile - 0 -->
@@ -90,7 +90,7 @@
 			var lid = "";
 			$('#map_canvas').gmap('clear', 'markers');
 
-			$.getJSON('../../webapp-source/data/get_markers.php', {format:"json",north_lat:north_lat, east_lng:east_lng, south_lat:south_lat, west_lng:west_lng, filter_text: filter_text, filter_subtype: filter_subtype, username:username, listing_id: lid}, function(data) {
+			$.getJSON('http://communityfinder.net/data/get_markers.php', {format:"json",north_lat:north_lat, east_lng:east_lng, south_lat:south_lat, west_lng:west_lng, filter_text: filter_text, filter_subtype: filter_subtype, username:username, listing_id: lid}, function(data) {
 				$("#listItems").html("");
 				if(!data.markers || data.markers.length == 0){
 					$("#listItems").append(jQuery("<li>").append(jQuery("<p>").val("No results found").addClass("info-box")));
