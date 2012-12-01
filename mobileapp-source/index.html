@@ -1,73 +1,67 @@
 <html> 
 <head> 
-	<title>My Page</title> 
-	
-	        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <meta name="format-detection" content="telephone=no" />
-        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
-        <link rel="stylesheet" type="text/css" href="css/index.css" />
-	
+	<title>CommunityFinder.net</title> 
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+	<link rel="stylesheet" type="text/css" href="css/index.css" />
 	
 	<!-- jquery mobile - 1 -->
 	<link rel="stylesheet"  href="css/jqm_themes/default/jquery.mobile-1.2.0.css" />
-	<script src="js/jquery.js"></script>
+	<script src="js/jquery-1.8.3.min.js"></script>
 	<script src="js/jquery.mobile-1.2.0.min.js"></script>
 	<!-- jquery mobile - 0 -->
-
 
 	<!-- jquery maps - 1 -->
 	<script src="https://maps.googleapis.com/maps/api/js?sensor=true"></script>
 	<script src="js/jquery.ui.map.min.js"></script>
 	<script src="js/jquery.ui.map.extensions.js"></script>
-	<script src="js/jquery.ui.map.services.js"></script>
-	
-	        <script type="text/javascript" src="cordova-2.2.0.js"></script>
-        <script type="text/javascript" src="js/index.js"></script>
-        <script type="text/javascript">
-            app.initialize();
-        </script>
-	
+	<script src="js/jquery.ui.map.services.min.js"></script>
 	<!-- jquery maps - 0 -->
 	
-	
+	<!-- phonegap - 1 -->
+	<script type="text/javascript" src="cordova-2.2.0.js"></script>
+	<script type="text/javascript" src="js/index.js"></script>
+	<script type="text/javascript">
+		app.initialize();
+	</script>
+	<!-- phonegap - 0 -->
 <script>
-// dialog box http://localhost/jquery-ui-map/demos/jquery-google-maps-geocoding.html
-	// pages:
-	//		map of listings
-	//			map of listings based on list http://localhost/jquery-ui-map/demos/jquery-google-maps-data-attribute.html
-	//			map of listings with item selected (hover / snippet)
-	// 				pagination http://localhost/jquery-ui-map/demos/jquery-google-maps-extend-with-pagination.html
-	//		page view  http://localhost/jquery-ui-map/demos/jquery-google-maps-microdata.html
-	
-	// Move this into a utility function
-		/*
-				http://localhost/communityfinder/webapp-source/data/get_markers.php?
-					format=json&
-					north_lat=-35.59478566548724&
-					east_lng=149.1119384765625&
-					south_lat=-38.47079371120379&
-					west_lng=142.0806884765625&
-					filter_text=farm&
-					filter_subtype=&
-					username=&
-					listing_id=		
-		*/
-		
+	/////////////////////////////////////////////
+	// to add
+	/////////////////////////////////////////////
+	//	   	soon
+	//   		closing infoWindow before refresh markers (currently stays open if refresh search)
+	//
+	//		later
+	//   		dialog box when clicking marker 
+	//		  		http://jquery-ui-map.googlecode.com/svn/trunk/demos/jquery-google-maps-geocoding.html
+	//   		pagination of items when clicking a marker: 
+	//		  		http://jquery-ui-map.googlecode.com/svn/trunk/demos/jquery-google-maps-extend-with-pagination.html
+	//			micro data page view  
+	//		  		http://jquery-ui-map.googlecode.com/svn/trunk/demos/jquery-google-maps-microdata.html
+	/////////////////////////////////////////////
+	// to add
+	/////////////////////////////////////////////
+
+	var DEFAULT_LOCATION = new google.maps.LatLng(-37.820724999999996,145.03867549999998);
+	var DEFAULT_ZOOM = 15;
 		
 		// draw map centred on location. retrieve results
 		function mapLocation(location){
 			$('#map_canvas').gmap('option', 'center', location);
-			$('#map_canvas').gmap('option', 'zoom', 15);
+			$('#map_canvas').gmap('option', 'zoom', DEFAULT_ZOOM);
 			loadMarkers(location);
 		}
+		
+		// gecode location and do a search
+		// https://developers.google.com/maps/documentation/geocoding/
 		function findLocationByName(address){
-			// https://developers.google.com/maps/documentation/geocoding/
 			var geocoder = new google.maps.Geocoder(); // v3
 			geocoder.geocode( { 'address': address}, function(results, status) { // v3
 				switch (status) {
 					case google.maps.GeocoderStatus.OK:
 						var location = results[0];
-						console.log(location.formatted_address);
 						mapLocation(location.geometry.location);
 						return;
 					case google.maps.GeocoderStatus.ZERO_RESULTS:
@@ -88,6 +82,9 @@
 				}
 			});
 		}
+		
+		// does the search based on a location
+		// calls backend API
 		function loadMarkers(location){
 			var map = $('#map_canvas').gmap('get', 'map'); 
 			var Bounds = map.getBounds();
@@ -103,9 +100,32 @@
 			var username = "";
 			var lid = "";
 			$('#map_canvas').gmap('clear', 'markers');
+			$("#listItems").html("Loading items...")
 
+			/*
+				JSON call
+				/communityfinder/webapp-source/data/get_markers.php?
+					format=json&
+					north_lat=-35.59478566548724&
+					east_lng=149.1119384765625&
+					south_lat=-38.47079371120379&
+					west_lng=142.0806884765625&
+					filter_text=farm&
+					filter_subtype=&
+					username=&
+					listing_id=		
+			//*/		
+			
 			$.getJSON('http://communityfinder.net/data/get_markers.php', {format:"json",north_lat:north_lat, east_lng:east_lng, south_lat:south_lat, west_lng:west_lng, filter_text: filter_text, filter_subtype: filter_subtype, username:username, listing_id: lid}, function(data) {
 				$("#listItems").html("");
+				
+				/*
+				http://jquery-ui-map.googlecode.com/svn/trunk/demos/jquery-google-maps-data-attribute.html
+				format of LI
+							<li data-gmapping='{"id":"m_1","latlng":{"lat":27.6648274,"lng":-81.51575350000002},"tags":"drupal"}'>
+								<p class="info-box">Florida DrupalCamp - Feb 11 2012</p>
+							</li>
+				*/				
 				if(!data.markers || data.markers.length == 0){
 					$("#listItems").append(jQuery("<li>").append(jQuery("<p>").val("No results found").addClass("info-box")));
 				}
@@ -116,46 +136,18 @@
 						$("#listItems").append(jQuery("<li>").attr("data-gmapping", JSON.stringify(m_data)).append(jQuery("<p>").html('<a class="listing_link" data-parm="' + m.lid + '" href="#listing_detail" data-transition="fade">' + m.name + '</a>').addClass("info-box")));
 					}
 				}
-				
-				
-				loadMarksFromHTMLList();
+				loadMarkersFromList();
 			});
-	/*
-						<li data-gmapping='{"id":"m_1","latlng":{"lat":27.6648274,"lng":-81.51575350000002},"tags":"drupal"}'>
-							<p class="info-box">Florida DrupalCamp - Feb 11 2012</p>
-						</li>
-	
-				http://localhost/communityfinder/webapp-source/data/get_markers.php?
-					format=json&
-					north_lat=-35.59478566548724&
-					east_lng=149.1119384765625&
-					south_lat=-38.47079371120379&
-					west_lng=142.0806884765625&
-					filter_text=farm&
-					filter_subtype=&
-					username=&
-					listing_id=		
-	//*/		
 		}
-			
-		function loadMarksRefresh(){
+
+		// load markers based on current centre (used when center is not known. e.g. on dragend)
+		function loadMarkersRefresh(){
 			loadMarkers($('#map_canvas').gmap('option', 'center'));
 		}
 		
-		function loadMarkersFromJSON(){
-			$.getJSON( 'demo.json', function(data) { 
-				$.each( data.markers, function(i, marker) {
-					$('#map_canvas').gmap('addMarker', { 
-						'position': new google.maps.LatLng(marker.latitude, marker.longitude), 
-						'bounds': true 
-					}).click(function() {
-						$('#map_canvas').gmap('openInfoWindow', { 'content': marker.content }, this);
-					});
-				});
-			});		
-		}
-		
-		function loadMarksFromHTMLList(){
+		// reads meta-data in LI node and display on map
+		// http://jquery-ui-map.googlecode.com/svn/trunk/demos/jquery-google-maps-data-attribute.html
+		function loadMarkersFromList(){
 			$("[data-gmapping]").each(function(i,el) {
 				var data = $(el).data('gmapping');
 				$('#map_canvas').gmap('addMarker', {
@@ -174,12 +166,10 @@
 		}
 		
 		$(document).ready(function () {
-		
+
+			// item details page - 1
 			$("a.listing_link").live('click',function(e) {
-				console.log( $(this).attr("data-parm"));
 				$.getJSON('http://communityfinder.net/data/get_markers.php?format=json&listing_id=' + $(this).attr("data-parm"), function(data) {
-					console.log(data.markers[0]);
-	
 					$('#name').html(data.markers[0].name);
 					$('#description').html(data.markers[0].desc);
 					$('#user').html(data.markers[0].username);
@@ -187,17 +177,15 @@
 					$('#address').html(data.markers[0].address);
 					$('#phone').html(data.markers[0].phone);
 					$('#www').html(data.markers[0].www);
-
 				});
 			});
+			// item details page - 0
 			
-			$("#btnTest").click(function(e){
-				//findLocationByName('brunswick');
-				//loadMarksFromHTMLList();
-				//loadMarkersFromJSON();
-			});
-			
-			// specify location - 1
+			///////////////////////////////////////////////////////////////////////////
+			// main map page - 1
+			///////////////////////////////////////////////////////////////////////////
+
+			// search - 1
 			$("#btnLocation").click(function(e){
 				e.preventDefault();
 				findLocationByName($("#txtLocation").val());
@@ -210,154 +198,102 @@
 						 position = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
 					}
 					else{
-						position = new google.maps.LatLng(-37.820724999999996,145.03867549999998);
+						position = DEFAULT_LOCATION;;
 					}
 					mapLocation(position);
 				});
 			});
-			// specify location - 0
+			// search - 0
 			
+			// filter - 1
 			$("#btnSearch").click(function(e){
 				var map = $('#map_canvas').gmap('get', 'center'); 
 				loadMarkers($('#map_canvas').gmap('option', 'center'));
 			});
+			// filter - 0
+
 			
-			$('#map_canvas').gmap().bind('init', function(evt, map) {
-				
+			// init map - 1
+			$('#map_canvas').gmap({'center': DEFAULT_LOCATION, 'zoom': DEFAULT_ZOOM}).bind('init', function(evt, map) {
+				loadMarkersRefresh();
 				
 				// drag map. load search after 1 second after drag ends
 				var drag_timer;
 				$(map).dragend(function(){
 					clearTimeout(drag_timer);
-					drag_timer = setTimeout("loadMarksRefresh()", 1000);
+					drag_timer = setTimeout("loadMarkersRefresh()", 1000);
 				});
 				$(map).drag(function(){
 					clearTimeout(drag_timer);
 				});
-				// 
-				
-				
-				$('#map_canvas').gmap('getCurrentPosition', function(position, status) {
-					var clientPosition;
-					if ( status === 'OK' ) {
-						 clientPosition = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-					}
-					else{
-						clientPosition = new google.maps.LatLng(-37.820724999999996,145.03867549999998);
-					}
-				
-					
-					/* add shape
-					$('#map_canvas').gmap('addShape', 'Circle', { 
-						'strokeWeight': 0, 
-						'fillColor': "#008595", 
-						'fillOpacity': 0.25, 
-						'center': clientPosition, 
-						'radius': 15, 
-						'clickable': false 
-					});
-					//*/
-				});   
 			});
-
-
-			/* standard Google Maps - ignore for now
-			var mapOptions = {
-				zoom: 14,
-				center: new google.maps.LatLng(0,0),
-				mapTypeId: google.maps.MapTypeId.ROADMAP
-			}; // v3
-			map = new google.maps.Map(document.getElementById('map_div'), mapOptions); // v3
-			
-			//bind map clicks to map click controller	
-			//GEvent.bind(map, "click", this, this.onMapClick); // v2
-			google.maps.event.addListener(map, 'click', function(event){ application.onMapClick(null, event.latLng); }); // v3
-			//*/
+			// init map - 0
+			///////////////////////////////////////////////////////////////////////////
+			// main map page - 0
+			///////////////////////////////////////////////////////////////////////////
 		});
 
 
 </script>
 </head> 
 <body> 
+	<div data-role="page" id="map">
+		<div data-role="header">
+			<h1>CommunityFinder.net</h1>
+		</div><!-- /header -->
 
-<div data-role="page" id="map">
+		<div data-role="content">	
+			Step 1: Specify location <input id="txtLocation" type="text" value="brunswick west"><input id="btnLocation" type="button" value="View Location">
+			<input id="btnMyLocation" type="button" value="Near Me">
 
-	<div data-role="header">
-		<h1>My Title</h1>
-	</div><!-- /header -->
+			<div id="map_canvas" style="height: 300px; width: 100%"></div>
+			Step 2: Add filter <input id="txtSearch" type="text"><input id="btnSearch" type="button" value="Search Location">
 
-	<div data-role="content">	
-		Step 1: Specify location <input id="txtLocation" type="text" value="brunswick"><input id="btnLocation" type="button" value="View Location">
-		<input id="btnMyLocation" type="button" value="Near Me">
+			<ul id='listItems'>
+			</ul>
+		</div><!-- /content -->
+	</div><!-- /page -->
 
-		<div id="map_canvas" style="height: 300px; width: 100%"></div>
-		Step 2: Add filter <input id="txtSearch" type="text"><input id="btnSearch" type="button" value="Search Location">
-
-					<ul id='listItems'>
-						<li data-gmapping='{"id":"m_1","latlng":{"lat":27.6648274,"lng":-81.51575350000002},"tags":"drupal"}'>
-							<p class="info-box">Florida DrupalCamp - Feb 11 2012</p>
-						</li>
-						<li data-gmapping='{"id":"m_2","latlng":{"lat":1.352083,"lng":103.81983600000001},"tags":"drupal"}'>
-							<p class="info-box">DrupalCamp Singapore - Mar 03 2012</p>					
-						</li>
-						<li data-gmapping='{"id":"m_3","latlng":{"lat":39.7391536,"lng":-104.9847034},"tags":"drupal"}'>
-							<p class="info-box">DrupalCon 2012 Denver - Mar 20 2012</p>				
-						</li>
-						<li data-gmapping='{"id":"m_4","latlng":{"lat":36.1658899,"lng":-86.7844432},"tags":"drupal"}'>
-							<p class="info-box">DrupalCamp Nashville - Apr 28 2012</p>				
-						</li>
-						<li data-gmapping='{"id":"m_5","latlng":{"lat":55.6760968,"lng":12.568337100000008},"tags":"drupal"}'>
-							<p class="info-box">DrupalCamp Copenhagen 5.0 - May 11 2012</p>				
-						</li>
-					</ul>
-
-		<input id="btnTest" type="button" value="test">
-	</div><!-- /content -->
-
-</div><!-- /page -->
-
-
-<div data-role="page" id="listing_detail">
-        	<div data-role="header">
-		<h1 id="name">My Title</h1>
-	</div><!-- /header -->
-            <div data-role="content">
-
-                <div class="ui-grid-a">
-                    <div class="ui-block-a">
-                        <h5 id="user">
-                            Added by
-                        </h5>
-                    </div>
-                    <div class="ui-block-b" id="type">
-                        <h3 id="type">
-                            Category
-                        </h3>
-                    </div>
-                </div>
-                <h5 id="address">
-                    Street, Suburb, City, Postcode
-                </h5>
-                <div id="phone">
-                    <a href="tel:0400200700" target="_blank" data-transition="fade">
-                        Phone
-                    </a>
-                </div>
-                <div id="www">
-                    <a href="google.com" target="_blank" data-transition="fade">
-                        Web Site
-                    </a>
-                </div>
-                <span id="description">
-                    Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec sed odio dui.
-                </span>
-                <div>
-                    <a href="#" target="_blank" data-transition="fade">
-                        Share link
-                    </a>
-                </div>
-            </div>
-        </div>
+	<div data-role="page" id="listing_detail">
+		<div data-role="header">
+			<h1 id="name">My Title</h1>
+		</div><!-- /header -->
+		<div data-role="content">
+			<div class="ui-grid-a">
+				<div class="ui-block-a">
+					<h5 id="user">
+						Added by
+					</h5>
+				</div>
+				<div class="ui-block-b" id="type">
+					<h3 id="type">
+						Category
+					</h3>
+				</div>
+			</div>
+			<h5 id="address">
+				Street, Suburb, City, Postcode
+			</h5>
+			<div id="phone">
+				<a href="tel:0400200700" target="_blank" data-transition="fade">
+					Phone
+				</a>
+			</div>
+			<div id="www">
+				<a href="google.com" target="_blank" data-transition="fade">
+					Web Site
+				</a>
+			</div>
+			<span id="description">
+				Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec sed odio dui.
+			</span>
+			<div>
+				<a href="#" target="_blank" data-transition="fade">
+					Share link
+				</a>
+			</div>
+		</div>
+	</div>
         <!-- /page listing_detail -->
 </body>
 </html>
