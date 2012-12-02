@@ -199,6 +199,30 @@
 				});
 			});
 		}
+		
+		
+			
+				// Was there an error getting the Location? If so, default to google maps or default location
+		function getLocationError(error){
+			  
+			$(MAP_ID).gmap('getCurrentPosition', function(position, status) {
+					if ( status === 'OK' ) {
+						e.preventDefault();
+						position = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+					}
+					else
+					{
+						position = DEFAULT_LOCATION;
+					}
+					
+					mapLocation(position);		  
+			});
+		}
+		
+		function getCurrentLocation(position) {
+			mapLocation(position);
+		}
+		
 		$(document).ready(function () {
 
 			// item details page - 1
@@ -225,19 +249,16 @@
 				e.preventDefault();
 				findLocationByName($("#txtLocation").val());
 			});
+			
 			$("#btnMyLocation").click(function(e){
-				$(MAP_ID).gmap('getCurrentPosition', function(position, status) {
-					var position;
-					if ( status === 'OK' ) {
-						e.preventDefault();
-						 position = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-					}
-					else{
-						position = DEFAULT_LOCATION;;
-					}
-					mapLocation(position);
-				});
+				var position;
+
+				position = navigator.geolocation.getCurrentPosition(getCurrentLocation, 
+                                         getLocationError, 
+                                         { maximumAge: 3000, timeout: 5000, enableHighAccuracy: true });
+                   
 			});
+			
 			// search - 0
 			
 			// filter - 1
