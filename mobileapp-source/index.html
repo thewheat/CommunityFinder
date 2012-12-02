@@ -137,9 +137,10 @@
 							<li data-gmapping='{"id":"m_1","latlng":{"lat":27.6648274,"lng":-81.51575350000002},"tags":"drupal"}'>
 								<p class="info-box">Florida DrupalCamp - Feb 11 2012</p>
 							</li>
-				*/				
+				*/
+				
 				if(!data.markers || data.markers.length == 0){
-					$("#listItems").append(jQuery("<li>").append(jQuery("<p>").val("No results found").addClass("info-box")));
+					$("#listItems").append(jQuery("<li>").append(jQuery("<p>").html("No results found").addClass("info-box")));
 				}
 				else{
 					for(var i = 0; i < data.markers.length; i++){
