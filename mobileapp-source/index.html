@@ -129,7 +129,7 @@
 			//*/		
 			
 			$.getJSON('http://communityfinder.net/data/get_markers.php', {format:"json",north_lat:north_lat, east_lng:east_lng, south_lat:south_lat, west_lng:west_lng, filter_text: filter_text, filter_subtype: filter_subtype, username:username, listing_id: lid}, function(data) {
-				$("#listItems").html("");
+				$("#listItems").empty();
 				$(MAP_ID).gmap('clear', 'markers');
 
 				/*
@@ -150,7 +150,7 @@
 						$("#listItems").append(jQuery("<li>").attr("data-gmapping", JSON.stringify(m_data)).html('<a class="info-box listing_link" data-parm="' + m.lid + '" href="#listing_detail" data-transition="fade">' + m.name + '</a>'));
 					}
 				}
-				$("#listItems").listview();
+				$("#listItems").listview("refresh");
 				loadMarkersFromList();
 			});
 		}
@@ -232,8 +232,13 @@
 		function getCurrentLocation(position) {
 			try{
 				mapLocation(position); // fails on desktop. for phonegap only?
-			}catch(err){ // for desktop. 
+			}catch(err){ // for desktop.
+				try{
 				mapLocation(new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
+				}
+				catch(err2){
+					getLocationError();
+				}
 			}
 		}
 		
@@ -326,7 +331,7 @@
 				<input id="btnSearch" type="button" value="Filter">
 			</div>
 
-			<ul id='listItems'>
+			<ul id='listItems' data-role="listview">
 			</ul>
 		</div><!-- /content -->
 	</div><!-- /page -->
