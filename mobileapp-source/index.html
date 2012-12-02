@@ -27,10 +27,8 @@
 	</script>
 	<!-- phonegap - 0 -->
 	<style>
-		#listItems a{
-			display: block;
-			padding: 5px;
-			font-size: 1.5em;
+		ul#listItems {
+			margin-top: 1em;
 		}
 	</style>
 <script>
@@ -140,15 +138,16 @@
 				*/
 				
 				if(!data.markers || data.markers.length == 0){
-					$("#listItems").append(jQuery("<li>").append(jQuery("<p>").html("No results found").addClass("info-box")));
+					$("#listItems").append(jQuery("<li>").html("No results found"));
 				}
 				else{
 					for(var i = 0; i < data.markers.length; i++){
 						var m = data.markers[i];
 						var m_data = {id: m.lid, latlng: {lat: m.lat, lng: m.lng} };
-						$("#listItems").append(jQuery("<li>").attr("data-gmapping", JSON.stringify(m_data)).append(jQuery("<p>").html('<a class="listing_link" data-parm="' + m.lid + '" href="#listing_detail" data-transition="fade">' + m.name + '</a>').addClass("info-box")));
+						$("#listItems").append(jQuery("<li>").attr("data-gmapping", JSON.stringify(m_data)).html('<a class="info-box listing_link" data-parm="' + m.lid + '" href="#listing_detail" data-transition="fade">' + m.name + '</a>'));
 					}
 				}
+				$("#listItems").listview();
 				loadMarkersFromList();
 			});
 		}
@@ -300,7 +299,7 @@
 </script>
 </head> 
 <body> 
-	<div data-role="page" id="map" data-add-back-btn="true">
+	<div data-role="page" id="map">
 		<div data-role="header">
 			<h1>CommunityFinder.net</h1>
 		</div><!-- /header -->
@@ -325,7 +324,7 @@
 		</div><!-- /content -->
 	</div><!-- /page -->
 
-	<div data-role="page" id="listing_detail" data-add-back-btn="true">
+	<div data-role="page" id="listing_detail">
 		<div data-role="header">
 			<h1 id="name">My Title</h1>
 		</div><!-- /header -->
