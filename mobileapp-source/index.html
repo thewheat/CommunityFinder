@@ -30,6 +30,9 @@
 		ul#listItems {
 			margin-top: 1em;
 		}
+		a.listing_link {
+			color: #0000ff;
+		}
 	</style>
 <script>
 	/////////////////////////////////////////////
@@ -172,7 +175,7 @@
 						$(marker).triggerEvent('click');
 					});
 				}).click(function() {
-					$(MAP_ID).gmap('openInfoWindow', { 'content': $(el).find('.info-box').html() }, this);
+					$(MAP_ID).gmap('openInfoWindow', { 'content': $(el).find('.info-box').parent().html() }, this);
 				});
 			});		
 		}
@@ -299,7 +302,7 @@
 </script>
 </head> 
 <body> 
-	<div data-role="page" id="map" data-add-back-btn="true">
+	<div data-role="page" id="map">
 		<div data-role="header">
 			<h1>CommunityFinder.net</h1>
 		</div><!-- /header -->
@@ -324,7 +327,7 @@
 		</div><!-- /content -->
 	</div><!-- /page -->
 
-	<div data-role="page" id="listing_detail" data-add-back-btn="true">
+	<div data-role="page" id="listing_detail">
 		<div data-role="header">
 			<h1 id="name">My Title</h1>
 		</div><!-- /header -->
