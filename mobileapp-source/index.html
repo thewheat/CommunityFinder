@@ -101,7 +101,7 @@
 			var west_lng = SouthWest.lng();	
 			
 			var filter_text = $("#txtSearch").val();
-			var filter_subtype = "";
+			var filter_subtype = $("#ddlSearch").val();
 			var username = "";
 			var lid = "";
 			$("#listItems").prepend("Loading items...")
@@ -180,28 +180,25 @@
 		}
 		// dragging/zooming auto refresh functions - 0
 		
-		// Was there an error getting the Location? If so, default to google maps or default location
-		function getLocationError(error){
-			  
-			$(MAP_ID).gmap('getCurrentPosition', function(position, status) {
-					if ( status === 'OK' ) {
-						e.preventDefault();
-						position = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-					}
-					else
-					{
-						position = DEFAULT_LOCATION;
-					}
-					
-					mapLocation(position);		  
+		
+		function loadCategories(){
+			var restrict_subtype = '';
+			$.get('http://communityfinder.net/data/get_subtypes.php',{restrict_subtype: restrict_subtype}, function(data) {
+				$("#ddlSearch").html("");
+				$("#ddlSearch").append(jQuery("<option>").attr("value", "").html("-- Any --"));
+				$(data).find('icon').each(function(i) {	
+					var subtype = $(this).attr('subtype');
+					var type = $(this).attr('type');
+					var is_addable = $(this).attr('is_addable');
+					var image = $(this).attr("image");
+					var subtype_name = $(this).attr("subtype_name");
+					var type_name = $(this).attr("type_name");
+					var prefixes = ($(this).attr("prefixes")) ? ($(this).attr("prefixes")).split(',') : null;
+					var prefixes_help = $(this).attr("prefixes_help");
+					$("#ddlSearch").append(jQuery("<option>").attr("value", subtype).html(subtype_name));
+				});
 			});
 		}
-		
-		function getCurrentLocation(position) {
-			mapLocation(position);
-		}
-		
-		
 		$(document).ready(function () {
 
 			// item details page - 1
@@ -223,28 +220,29 @@
 			///////////////////////////////////////////////////////////////////////////
 
 			// search - 1
+			$("#lnkLocation").click(function(e){ $("#divLocation").toggle(); });
 			$("#btnLocation").click(function(e){
 				e.preventDefault();
 				findLocationByName($("#txtLocation").val());
 			});
-			
-			/*
-			navigator.geolocation.getCurrentPosition(geolocationSuccess, 
-                                         [geolocationError], 
-                                         [geolocationOptions]);
-			*/
-			
 			$("#btnMyLocation").click(function(e){
-				var position;
-
-				position = navigator.geolocation.getCurrentPosition(getCurrentLocation, 
-                                         getLocationError, 
-                                         { maximumAge: 3000, timeout: 5000, enableHighAccuracy: true });
-                   
+				$(MAP_ID).gmap('getCurrentPosition', function(position, status) {
+					var position;
+					if ( status === 'OK' ) {
+						e.preventDefault();
+						 position = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+					}
+					else{
+						position = DEFAULT_LOCATION;;
+					}
+					mapLocation(position);
+				});
 			});
 			// search - 0
 			
 			// filter - 1
+			loadCategories();
+			$("#lnkSearch").click(function(e){ $("#divSearch").toggle(); });
 			$("#btnSearch").click(function(e){
 				loadMarkers($(MAP_ID).gmap('option', 'center'));
 			});
@@ -279,11 +277,19 @@
 		</div><!-- /header -->
 
 		<div data-role="content">	
-			Step 1: Specify location <input id="txtLocation" type="text" value="brunswick west"><input id="btnLocation" type="button" value="View Location">
-			<input id="btnMyLocation" type="button" value="Near Me">
+			<a href="#" id="lnkLocation" data-role="button" data-theme="b">Specify location </a>
+			<div id="divLocation" style="display: none">
+				<input id="txtLocation" type="text" value="brunswick west"><input id="btnLocation" type="button" value="Set Location">
+				<input id="btnMyLocation" type="button" value="Near Me" data-role="button" data-theme="a">
+			</div>
 
 			<div id="map_canvas" style="height: 300px; width: 100%"></div>
-			Step 2: Add filter <input id="txtSearch" type="text"><input id="btnSearch" type="button" value="Search Location">
+			<a href="#" id="lnkSearch" data-role="button" data-theme="b">Filter Results</a>
+			<div id="divSearch" style="display: none">
+				<input id="txtSearch" type="text">
+				<select id="ddlSearch"></select>
+				<input id="btnSearch" type="button" value="Filter">
+			</div>
 
 			<ul id='listItems'>
 			</ul>
