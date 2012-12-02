@@ -230,7 +230,11 @@
 		}
 		
 		function getCurrentLocation(position) {
-			mapLocation(position);
+			try{
+				mapLocation(position); // fails on desktop. for phonegap only?
+			}catch(err){ // for desktop. 
+				mapLocation(new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
+			}
 		}
 		
 		$(document).ready(function () {
