@@ -30,6 +30,9 @@
 		ul#listItems {
 			margin-top: 1em;
 		}
+		a.listing_link {
+			color: #0000ff;
+		}
 	</style>
 <script>
 	/////////////////////////////////////////////
@@ -172,7 +175,7 @@
 						$(marker).triggerEvent('click');
 					});
 				}).click(function() {
-					$(MAP_ID).gmap('openInfoWindow', { 'content': $(el).find('.info-box').html() }, this);
+					$(MAP_ID).gmap('openInfoWindow', { 'content': $(el).find('.info-box').parent().html() }, this);
 				});
 			});		
 		}
