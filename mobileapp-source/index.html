@@ -26,33 +26,7 @@
 		app.initialize();
 	</script>
 	<!-- phonegap - 0 -->
-	<style>
-		ul#listItems {
-			margin-top: 1em;
-		}
-		a.listing_link {
-			color: #0000ff;
-		}
-	#map-page, .ui-content, #map_canvas { width: 100%; height: 100%; padding: 0; }
-	#map_canvas { height: 100%; min-height: 100%; }
 
-#toolbarPanel-popup {
-    top: 40px !important;
-    bottom: auto !important;
-    //left: 10; //right:10;
-    width:100%;
-}
-#toolbarPanel {
-    //width: 100%;
-    //border: 1px solid #000;
-    //border-top: none;
-    //background: rgba(0,0,0,.5);
-    //margin: 0 -1px;
-}
-
-
-
-	</style>
 <script>
 	/////////////////////////////////////////////
 	// to add
@@ -406,7 +380,7 @@
 
 	<div data-role="page" id="listing_detail" data-add-back-btn="true">
 		<div data-role="header" data-position="fixed" data-id="head" id="headbar">
-                        <h1>CommunityFinder</h1>
+                        <h1 id="name">CommunityFinder</h1>
                         <a href="#toolbarPanel" data-rel="popup" data-transition="slide" data-position-to="window" data-role="button" class="ui-btn-right" data-icon="arrow-d">Menu</a>
                         <div data-role="popup" id="toolbarPanel" data-corners="false" data-theme="none" data-shadow="false" data-tolerance="0,0" data-position-to="#">
                         <div data-role="navbar">
