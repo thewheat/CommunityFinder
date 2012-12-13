@@ -233,7 +233,8 @@
 			
 				// Was there an error getting the Location? If so, default to google maps or default location
 		function getLocationError(error){
-			  
+			  		alert ('There has been a problem' + error.message);
+
 			$(MAP_ID).gmap('getCurrentPosition', function(position, status) {
 					if ( status === 'OK' ) {
 						e.preventDefault();
@@ -302,7 +303,7 @@
 
 				position = navigator.geolocation.getCurrentPosition(getCurrentLocation, 
                                          getLocationError, 
-                                         { maximumAge: 3000, timeout: 5000, enableHighAccuracy: true });
+                                         { maximumAge: 3000, timeout: 15000, enableHighAccuracy: true });
                    
 			});
 			
