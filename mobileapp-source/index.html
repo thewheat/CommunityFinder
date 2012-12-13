@@ -252,10 +252,11 @@
 				$.getJSON('http://communityfinder.net/data/get_markers.php?format=json&listing_id=' + $(this).attr("data-parm"), function(data) {
 					$('#name').html(data.markers[0].name);
 					$('#description').html(data.markers[0].desc);
-					$('#user').html(data.markers[0].username);
+					$('#user').append(data.markers[0].username);
 					$('#type').html(data.markers[0].type);
 					$('#address').html(data.markers[0].address);
 					$('#phone').html(data.markers[0].phone);
+					$('#phone').attr('href', 'tel:' + data.markers[0].phone);
 					$('#www').html(data.markers[0].www);
 				});
 			});
@@ -380,10 +381,11 @@
 
 	<div data-role="page" id="listing_detail" data-add-back-btn="true">
 		<div data-role="header" data-position="fixed" data-id="head" id="headbar">
-                        <h1 id="name">CommunityFinder</h1>
+                        <h1>CommunityFinder</h1>
                         <a href="#toolbarPanel" data-rel="popup" data-transition="slide" data-position-to="window" data-role="button" class="ui-btn-right" data-icon="arrow-d">Menu</a>
                         <div data-role="popup" id="toolbarPanel" data-corners="false" data-theme="none" data-shadow="false" data-tolerance="0,0" data-position-to="#">
                         <div data-role="navbar">
+
                                 <ul>    
                                         <li><a href="#" onClick="openSearchPage();" data-icon="search">Find</a></li>
                                         <li><a href="#" onClick="openMapPage();" data-icon="plus">Map</a></li>
@@ -394,6 +396,8 @@
                         </div>
                 </div><!-- /header -->
 		<div data-role="content">
+		                                                <h1 id="name">CommunityFinder</h1>
+
 			<div class="ui-grid-a">
 				<div class="ui-block-a">
 					<h5 id="user">
