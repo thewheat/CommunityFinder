@@ -250,6 +250,10 @@
 			// item details page - 1
 			$("a.listing_link").live('click',function(e) {
 				$.getJSON('http://communityfinder.net/data/get_markers.php?format=json&listing_id=' + $(this).attr("data-parm"), function(data) {
+					
+					console.log(data.markers[0]);
+	
+					
 					$('#name').html(data.markers[0].name);
 					$('#description').html(data.markers[0].desc);
 					$('#user').append(data.markers[0].username);
@@ -257,7 +261,16 @@
 					$('#address').html(data.markers[0].address);
 					$('#phone').html(data.markers[0].phone);
 					$('#phone').attr('href', 'tel:' + data.markers[0].phone);
-					$('#www').html(data.markers[0].www);
+					
+					var value = data.markers[0].www; // value = 9.61 use $("#text").text() if you are not on select box...
+					value = value.replace("http://", ""); // value = 9:61
+
+					$('#www').html(value);
+					$('#www').attr('href', 'http://' + value);
+
+					$('#map_canvas_small').gmap('addMarker', { /*id:'m_1',*/ 'position': data.markers[0].lat + ',' + data.markers[0].lng, 'bounds': true});
+					$('#map_canvas_small').gmap('option', 'zoom', 14);
+
 				});
 			});
 			// item details page - 0
@@ -400,36 +413,41 @@
 
 			<div class="ui-grid-a">
 				<div class="ui-block-a">
-					<h5 id="user">
-						Added by
-					</h5>
-				</div>
-				<div class="ui-block-b" id="type">
-					<h3 id="type">
+                				<h3 id="type">
 						Category
 					</h3>
+			
+                     <div id="map_canvas_small"></div>
 				</div>
-			</div>
+				<div class="ui-block-b">
 			<h5 id="address">
 				Street, Suburb, City, Postcode
 			</h5>
+				</div>
+			</div>
+                                   
+
+	
 			<div id="phone">
 				<a href="tel:0400200700" target="_blank" data-transition="fade">
 					Phone
 				</a>
 			</div>
-			<div id="www">
-				<a href="google.com" target="_blank" data-transition="fade">
+			<div>
+				<a id="www" href="google.com" target="_blank" data-transition="fade">
 					Web Site
 				</a>
 			</div>
-			<span id="description">
+			<div id="description">
 				Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec sed odio dui.
-			</span>
+			</div>
 			<div>
 				<a href="#" target="_blank" data-transition="fade">
 					Share link
 				</a>
+                		<h5 id="user">
+						Added by
+					</h5>
 			</div>
 		</div>
 	</div>
