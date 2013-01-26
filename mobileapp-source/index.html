@@ -219,7 +219,9 @@
 
 		function loadMyMarkers(){
 			loadingMsg(true);
-			$.getJSON(config.prefix + 'data/get_markers.php', {format:"json",username:config.user}, function(data) {
+			//alert(config.user);
+			//alert(config.username);
+			$.getJSON(config.prefix + 'data/get_markers.php', {format:"json", username: config.username}, function(data) {
 				$("#listItems").empty();
 				$(MAP_ID).gmap('clear', 'markers');
 				if(!data.markers || data.markers.length == 0){
@@ -407,20 +409,66 @@
 			$.post(config.prefix+'data/delete_resource.php', {lid:lid}, function(data) {
 				if($(data).find("response_state").attr("success") == 'true') {
 					popupMsg("Deleted");
-					openSearchPage();
+					loadMyMarkers();
 				}
 				else
 					popupMsg("Error deleting");
 			});
 		}
+		function openDetailsPage(lid){
+			$("#listing_detail").attr("data-parm", lid);
+			$.getJSON(config.prefix + 'data/get_markers.php?format=json&listing_id=' + lid, function(data) {
+				
+				//console.log(data.markers[0]);
+				var name = data.markers[0].name;
+				
+				$('#name').html(name);
+				$('#description').html(data.markers[0].desc);
+				$('#user').text(data.markers[0].username);
+				$('#type').html(data.markers[0].type);
+				$('#address').html(data.markers[0].address);
+				$('#phone').html(data.markers[0].phone);
+				$('#phone').attr('href', 'tel:' + data.markers[0].phone);
 
+
+				$('#link_code').hide();
+				$('#embed_code').hide()
+
+				var escaped_name = name.replace("\"", "\\\"");
+				$(".share.href").each(function(i){
+					var val = $(this).attr("href");
+					val = val.replace("{id}", lid);
+					val = val.replace("{name}", escaped_name);
+					$(this).attr("href", val);
+				});
+				$(".share.value").each(function(i){
+					var val = $(this).val();
+					val = val.replace("{id}", lid);
+					val = val.replace("{name}", escaped_name);
+					val = val.replace("{zoom}", 14); // to dynamically change this?
+					val = val.replace("{lat}", data.markers[0].lat);
+					val = val.replace("{lng}", data.markers[0].lng);
+					$(this).val(val);
+				});
+
+				var value = data.markers[0].www; // value = 9.61 use $("#text").text() if you are not on select box...
+				if(value) value = value.replace("http://", ""); // value = 9:61
+
+				$('#www').html(value);
+				$('#www').attr('href', 'http://' + value);
+
+				$('#map_canvas_small').gmap('addMarker', { /*id:'m_1',*/ 'position': data.markers[0].lat + ',' + data.markers[0].lng, 'bounds': true});
+				$('#map_canvas_small').gmap('option', 'zoom', 14);
+				loadingMsg(false);
+			}
+		
 		function openEditPage(lid){
 			if(!lid) lid = $("#listing_detail").attr("data-parm");
 				loadingMsg(true);
 				$("#edit_detail").attr("data-parm", lid);
 				$.getJSON(config.prefix + 'data/get_markers.php?format=json&listing_id=' + lid, function(data) {
 					
-					console.log(data.markers[0]);
+					//console.log(data.markers[0]);
 /*
 ac_email: ""
 ac_on: 0
@@ -636,52 +684,7 @@ username: "user"
 			$("a.listing_link").live('click',function(e) {
 				loadingMsg(true);
 				var lid = $(this).attr("data-parm");
-				$("#listing_detail").attr("data-parm", lid);
-				$.getJSON(config.prefix + 'data/get_markers.php?format=json&listing_id=' + lid, function(data) {
-					
-					//console.log(data.markers[0]);
-					var name = data.markers[0].name;
-					
-					$('#name').html(name);
-					$('#description').html(data.markers[0].desc);
-					$('#user').text(data.markers[0].username);
-					$('#type').html(data.markers[0].type);
-					$('#address').html(data.markers[0].address);
-					$('#phone').html(data.markers[0].phone);
-					$('#phone').attr('href', 'tel:' + data.markers[0].phone);
-
-
-					$('#link_code').hide();
-					$('#embed_code').hide()
-
-					var escaped_name = name.replace("\"", "\\\"");
-					$(".share.href").each(function(i){
-						var val = $(this).attr("href");
-						val = val.replace("{id}", lid);
-						val = val.replace("{name}", escaped_name);
-						$(this).attr("href", val);
-					});
-					$(".share.value").each(function(i){
-						var val = $(this).val();
-						val = val.replace("{id}", lid);
-						val = val.replace("{name}", escaped_name);
-						val = val.replace("{zoom}", 14); // to dynamically change this?
-						val = val.replace("{lat}", data.markers[0].lat);
-						val = val.replace("{lng}", data.markers[0].lng);
-						$(this).val(val);
-					});
-
-					var value = data.markers[0].www; // value = 9.61 use $("#text").text() if you are not on select box...
-					if(value) value = value.replace("http://", ""); // value = 9:61
-
-					$('#www').html(value);
-					$('#www').attr('href', 'http://' + value);
-
-					$('#map_canvas_small').gmap('addMarker', { /*id:'m_1',*/ 'position': data.markers[0].lat + ',' + data.markers[0].lng, 'bounds': true});
-					$('#map_canvas_small').gmap('option', 'zoom', 14);
-					loadingMsg(false);
-
-				});
+				openDetailsPage(lid);
 			});
 			// item details page - 0
 			
@@ -747,7 +750,7 @@ tags:,organic,transport,general,type of group:sustainability,type of group:type
 					}, function(data) {
 						if($(data).find("response_state").attr("success") == 'true') {
 							popupMsg("Saved");
-							openSearchPage();
+							openDetailsPage(data.lid);
 						}
 						else {
 							if(doOnFailure) {doOnFailure('Failed to save');}
