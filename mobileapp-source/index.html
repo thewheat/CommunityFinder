@@ -419,9 +419,9 @@
 			$("#listing_detail").attr("data-parm", lid);
 			$.getJSON(config.prefix + 'data/get_markers.php?format=json&listing_id=' + lid, function(data) {
 				
-				//console.log(data.markers[0]);
+				console.log(data.markers[0]);
 				var name = data.markers[0].name;
-				
+				if(!name) name = '';
 				$('#name').html(name);
 				$('#description').html(data.markers[0].desc);
 				$('#user').text(data.markers[0].username);
@@ -459,8 +459,11 @@
 
 				$('#map_canvas_small').gmap('addMarker', { /*id:'m_1',*/ 'position': data.markers[0].lat + ',' + data.markers[0].lng, 'bounds': true});
 				$('#map_canvas_small').gmap('option', 'zoom', 14);
+				
+				$.mobile.changePage("#listing_detail");
 				loadingMsg(false);
-			}
+			});
+		}
 		
 		function openEditPage(lid){
 			if(!lid) lid = $("#listing_detail").attr("data-parm");
@@ -515,7 +518,7 @@ username: "user"
 					$('#edit-category').text(data.markers[0].subtype_name);
 					
 					
-					$('#edit-name').text(name);
+					$('#edit-name').val(name);
 					$('#edit-description').val(data.markers[0].desc);
 					$('#edit-phone').val(data.markers[0].phone);
 					$('#edit-address').val(data.markers[0].address);
@@ -528,8 +531,14 @@ username: "user"
 					$("#edit-www").val(data.markers[0].www);
 					$("#edit-rss").val(data.markers[0].rss);
 					$('.invite_details').hide();
-					$("#edit-is_invite").attr("checked", (data.markers[0].ac_on == 1) ? "checked" : "");
-					if(data.markers[0].ac_on == 1) $('.invite_details').show();
+					if(data.markers[0].ac_on == 1) {
+						$('.invite_details').show();
+						$("#edit-is_invite").attr("checked", "checked");
+					}
+					else{
+						$('.invite_details').hide();
+						$("#edit-is_invite").removeAttr("checked");
+					}
 					$("#edit-invite_email").val(data.markers[0].ac_email);
 					$("#edit-invite_url").val(data.markers[0].ac_url);
 					loadingMsg(false);
@@ -609,9 +618,9 @@ username: "user"
 		$(document).on( "pagebeforechange", function( e, data ) {
 			if ( typeof data.toPage === "string" ) {
 					var u = $.mobile.path.parseUrl( data.toPage );
-					console.log("to page: " + data.toPage + "|" );
-					console.log(u.hash);
-					console.log(data);
+					//console.log("to page: " + data.toPage + "|" );
+					//console.log(u.hash);
+					//console.log(data);
 					if ( u.hash.search(/^#conversation-page/) !== -1 && false) {
 						//pageSelector = urlObj.hash.replace( /\?.*$/, "" );
 						
@@ -659,6 +668,8 @@ username: "user"
 				});
 			}
 		}
+		
+		// ask server to verify if user is logged in
 		function isLoggedIn(){
 			$.post(config.prefix+'data/is_logged_in.php', {}, function(data) {
 				if($(data).find("response_state").attr("success") == 'true') {
@@ -675,29 +686,10 @@ username: "user"
 
 		}
 		
-		$(document).ready(function () {
-			$("#inbox-page ul.list a").live('click', function(e){
-				openConversationPage($(this).attr("data-url"));
-			});
-			// item details page - 1
-
-			$("a.listing_link").live('click',function(e) {
-				loadingMsg(true);
-				var lid = $(this).attr("data-parm");
-				openDetailsPage(lid);
-			});
-			// item details page - 0
-			
-
-			// edit - 1
-			$("#btnEdit").click(function(e){
-				e.preventDefault();
-				
-				var lid = $("#listing_detail").attr("data-parm");
-				editListing(lid);
-			});
-			function editListing(lid){
-				loadingMsg(true);
+		
+		// does the actual data transfer to server in order to edit a listing
+		function editListing(lid){
+			loadingMsg(true);
 /*
 
 lid:185
@@ -717,20 +709,21 @@ address:1
 phone:123
 tags:,organic,transport,general,type of group:sustainability,type of group:type
 */				
-				var data = {};
-				data.lid = lid;
-				var alltags = '';
-				var tags = $("#edit-tags_general").val().split(",");
-				for(var i in tags) {
-					alltags += ',' + tags[i];
-				}
-				tags = $("#edit-tags_type_of_group").val().split(",");
-				for(var i in tags) {
-					alltags += ',' + "type of group".replace(/_/g, ' ') + ':' + tags[i];
-				}
-				
-				
-				$.post(config.prefix + 'data/update_resource.php', {
+			var data = {};
+			data.lid = lid;
+			var alltags = '';
+			var tags = $("#edit-tags_general").val().split(",");
+			for(var i in tags) {
+				alltags += ',' + tags[i];
+			}
+			tags = $("#edit-tags_type_of_group").val().split(",");
+			for(var i in tags) {
+				alltags += ',' + "type of group".replace(/_/g, ' ') + ':' + tags[i];
+			}
+			
+			
+			$.post(config.prefix + 'data/update_resource.php', 
+				{
 					lid: data.lid,
 					title: $("#edit-name").val(),
 					desc: $("#edit-description").val(),
@@ -741,22 +734,45 @@ tags:,organic,transport,general,type of group:sustainability,type of group:type
 					www:$("#edit-www").val(),
 					wiki:$("#edit-wiki").val(),
 					rss:$("#edit-rss").val(),
-					is_invite:$("#edit-is_invite").val(),
+					is_invite:$("#edit-is_invite").val() == "on" ? 1 : 0,
 					invite_email:$("#edit-invite_email").val(),
 					invite_url:$("#edit-invite_url").val(),
 					address:$("#edit-address").val(),
 					phone:$("#edit-phone").val(),
 					tags:alltags
-					}, function(data) {
-						if($(data).find("response_state").attr("success") == 'true') {
-							popupMsg("Saved");
-							openDetailsPage(data.lid);
-						}
-						else {
-							if(doOnFailure) {doOnFailure('Failed to save');}
-						}
-						});
-			}
+				}, 
+				function(data) {
+					if($(data).find("response_state").attr("success") == 'true') {
+						//popupMsg("Saved");
+						openDetailsPage(lid);
+					}
+					else {
+						if(doOnFailure) {doOnFailure('Failed to save');}
+					}
+				}
+			);
+		}
+		
+		$(document).ready(function () {
+			$("#inbox-page ul.list a").live('click', function(e){
+				openConversationPage($(this).attr("data-url"));
+			});
+			// item details page - 1
+
+			$("a.listing_link").live('click',function(e) {
+				loadingMsg(true);
+				var lid = $(this).attr("data-parm");
+				openDetailsPage(lid);
+			});
+			// item details page - 0
+			
+
+			// edit - 1
+			$("#btnEdit").click(function(e){
+				e.preventDefault();				
+				var lid = $("#listing_detail").attr("data-parm");
+				editListing(lid);
+			});
 			// edit - 0
 			
 			///////////////////////////////////////////////////////////////////////////
@@ -816,61 +832,6 @@ tags:,organic,transport,general,type of group:sustainability,type of group:type
 </script>
 </head> 
 <body> 
-	<div id="popup" data-role="dialog">
-	    <div data-role="header" data-theme="d">
-	        <h1>Info</h1>
-	    </div>
-	    <div data-role="content" data-theme="c">
-	        <div class='content'></div>
-	        <a data-role="button" data-rel="back">Ok</a>
-	    </div>
-	</div>
-	<div data-role="page" id="login-page" data-add-back-btn="true">
-		<div data-role="header">
-			<h1>Login</h1>
-		</div>
-
-		<div data-role="content">
-			<form>
-			<div data-role="fieldcontain">
-				<label for="login-user">Username / Email:</label>
-	    		<input type="text" name="login-user" id="login-user" value=""  />
-			</div>	
-			<div data-role="fieldcontain">
-				<label for="login-pass">Password:</label>
-	    		<input type="password" name="login-pass" id="login-pass" value=""  />
-			</div>	
-			<input type="button" value="Login" onClick="login()">
-			</form>
-
-		</div>
-	</div>
-	<div data-role="page" id="register-page" data-add-back-btn="true">
-		<div data-role="header">
-			<h1>Register</h1>
-		</div>
-		<div data-role="content">
-			<form>
-			<div data-role="fieldcontain">
-				<label for="register-email">Email:</label>
-	    		<input type="text" name="register-email" id="register-email" value=""  />
-			</div>	
-			<div data-role="fieldcontain">
-				<label for="register-pass">Password:</label>
-	    		<input type="password" name="register-pass" id="register-pass" value=""  />
-			</div>	
-			<div data-role="fieldcontain">
-				<label for="register-full-name">Full name:</label>
-	    		<input type="text" name="register-full-name" id="register-full-name" value=""  />
-			</div>	
-			<div data-role="fieldcontain">
-				<label for="register-user">Username:</label>
-	    		<input type="text" name="register-user" id="register-user" value=""  />
-			</div>	
-			<input type="button" value="Register" onClick="register()">
-			</form>
-		</div>
-	</div>
 
 	<div data-role="page" id="search-page" data-add-back-btn="true">
 		<div data-role="header" data-position="fixed" data-id="head" id="headbar">
@@ -954,11 +915,9 @@ tags:,organic,transport,general,type of group:sustainability,type of group:type
 			</div>
 		</div><!-- /header -->
 		<div data-role="content">
-			<h1 id="name">CommunityFinder</h1>
- <input id='edit-lat' type="hidden" >
- <input id='edit-lng' type="hidden" >
- 
-			<table><tbody>
+<!-- 
+	<table>
+	<tbody>
 	<tr><td><b>Category: </b></td><td><b id='edit-category'></b></td></tr>
 	<tr><td><b>Title</b></td><td> <input id='edit-name' name="name" value="Borderlands Cooperative" style="width: 220px;" class="fg-input ui-corner-all"><span title="" style="float: right;" class="tag_link ui-icon ui-icon-info "></span></td></tr>
 	<tr><td><b>Description: </b></td><td> <textarea id='edit-description' name="description" cols="35" rows="2" class="fg-input ui-corner-all" style="width: 220px;">Independent network for holistic community activism, sustainability and action research. </textarea><span title="" class="tag_link ui-icon ui-icon-info " style="float: right;"></span></td></tr>
@@ -975,13 +934,82 @@ tags:,organic,transport,general,type of group:sustainability,type of group:type
 	<tr><td><b>WWW (ie http://..):</b></td><td> <input id="edit-www" name="www" value="http://www.borderlands.org.au" class="fg-input ui-corner-all" style="width: 220px;"><span title="Links listing to an associated Web Site" class="tag_link ui-icon ui-icon-info " style="float: right;"></span></td></tr>
 	<tr><td><b>RSS: (ie http://..)</b></td><td> <input id="edit-rss" name="rss" value="" class="fg-input ui-corner-all" style="width: 220px;"></td></tr>
 	<tr><td colspan="2"><hr></td></tr>
-	<tr><td colspan="2"><input onclick="$('.invite_details').toggle();" type="checkbox" id="edit-is_invite" name="is_invite" class="fg-input ui-corner-all"> <b>Customise 'contact us' link</b></td></tr>
+	<tr><td colspan="2">
+	
+	<input onclick="$('.invite_details').toggle();" type="checkbox" id="edit-is_invite" name="is_invite" class="fg-input ui-corner-all"> <b>Customise 'contact us' link</b></td></tr>
 	<tr class="invite_details" style="display: none;"><td colspan="2">Instead of using the built in inbox system, provide either an email address, or 'contact us' form url to customise the 'contact user' link on this listing.</td></tr>
-	<tr class="invite_details" style="display: none;"><td><b>Email:</b></td><td> <input id="edit-invite_email" name="invite_email" value="" size="35" class="fg-input ui-corner-all"> or </td></tr>
-	<tr class="invite_details" style="display: none;"><td><b>Contact URL:</b></td><td> <input id="edit-invite_url" name="invite_url" value="" size="35" class="fg-input ui-corner-all"></td></tr>
-	<tr><td colspan="2"><hr></td></tr></tbody></table>        
-				<input id="btnEdit" type="button" value="Save">
+	<tr class="invite_details" style="display: none;"><td><b>Email:</b></td><td> 
+	<input id="edit-invite_email" name="invite_email" value="" size="35" class="fg-input ui-corner-all"> or </td></tr>
+	<tr class="invite_details" style="display: none;"><td><b>Contact URL:</b></td><td> </td></tr>
+	<tr><td colspan="2"><hr></td></tr></tbody>
+				</table>        
+-->
+				<form>
+					Category: <b id='edit-category'></b>
 
+					<input id='edit-lat' type="hidden" >
+					<input id='edit-lng' type="hidden" >
+					<div>
+						<span title="" style="float: right;" class="tag_link ui-icon ui-icon-info "></span>
+						<label for="name">Title: </label>
+						<input id='edit-name' name="name" value="" class="fg-input ui-corner-all">
+					</div>
+					<div>
+						<span title="" class="tag_link ui-icon ui-icon-info " style="float: right;"></span>
+						<label for="description">Description: </label>
+						<textarea id='edit-description' name="description" cols="35" rows="2" class="fg-input ui-corner-all" ></textarea>
+					</div>
+					<div>
+						<label for="phone">Phone: </label>
+						<input id='edit-phone' name="phone" value="" class="fg-input ui-corner-all">
+					</div>
+					<div>
+						<label for="address">Address: </label>
+						<input id='edit-address' name="address" value="" class="fg-input ui-corner-all">
+					</div>
+					<div>
+						<label for="tags_general">Tags (general): </label>
+						<input name="tags_general" id="edit-tags_general" value="" class="fg-input ui-corner-all ui-autocomplete-input"  autocomplete="off">
+					</div>
+					<div>
+						<label for="tags_type_of_group">Tags (type of group): </label>
+						<input name="tags_type_of_group" id="edit-tags_type_of_group" value="" class="fg-input ui-corner-all ui-autocomplete-input"  autocomplete="off">
+						ie. environment, social justice etc
+					</div>
+					<div>
+						<span title="Links listing to associated Wikipedia page, just start typing and we'll suggest exisiting pages on wikipedia" class="tag_link ui-icon ui-icon-info " style="float: right;"></span>
+						<label for="wiki">Wikipedia Page:</label>
+						<input id="edit-wiki" name="wiki" value="" class="fg-input ui-corner-all ui-autocomplete-input"  autocomplete="off">
+					</div>
+					<div>
+						<span title="Links listing to an associated Web Site" class="tag_link ui-icon ui-icon-info " style="float: right;"></span>
+						<label for="www">WWW (ie http://..): </label>
+						<input id="edit-www" name="www" value="" class="fg-input ui-corner-all" >
+					</div>
+					<div>
+						<label for="rss">RSS: (ie http://..) </label>
+						<input id="edit-rss" name="rss" value="" class="fg-input ui-corner-all" >
+					</div>
+					
+					<div data-role="fieldcontain">
+						<input onclick="$('.invite_details').toggle();" type="checkbox" id="edit-is_invite" name="is_invite" class="fg-input ui-corner-all">
+						<label for="is_invite">Customise 'contact us' link</label>
+					</div>
+					<div class="invite_details" style="display: none;">
+						Instead of using the built in inbox system, provide either an email address, or 'contact us' form url to customise the 'contact user' link on this listing.
+					</div>	
+					<div class="invite_details" style="display: none;">
+						<label for="invite_email">Email:</label>
+						<input id="edit-invite_email" name="invite_email" value="" class="fg-input ui-corner-all"> or 
+					</div>	
+					<div class="invite_details" style="display: none;">
+						<label for="invite_url">Contact URL:</label>
+						<input id="edit-invite_url" name="invite_url" value="" class="fg-input ui-corner-all">
+					</div>	
+
+					<input type="button" value="Save" id="btnEdit">
+				</form>
+				
 			<div>
 			</div>
 		</div>
@@ -1174,5 +1202,62 @@ old code
 			</ul>
 		</div><!-- /content -->
 	</div><!-- /page -->	
+	
+	<div id="popup" data-role="dialog">
+	    <div data-role="header" data-theme="d">
+	        <h1>Info</h1>
+	    </div>
+	    <div data-role="content" data-theme="c">
+	        <div class='content'></div>
+	        <a data-role="button" data-rel="back">Ok</a>
+	    </div>
+	</div>
+	<div data-role="page" id="login-page" data-add-back-btn="true">
+		<div data-role="header">
+			<h1>Login</h1>
+		</div>
+
+		<div data-role="content">
+			<form>
+			<div data-role="fieldcontain">
+				<label for="login-user">Username / Email:</label>
+	    		<input type="text" name="login-user" id="login-user" value=""  />
+			</div>	
+			<div data-role="fieldcontain">
+				<label for="login-pass">Password:</label>
+	    		<input type="password" name="login-pass" id="login-pass" value=""  />
+			</div>	
+			<input type="button" value="Login" onClick="login()">
+			</form>
+
+		</div>
+	</div>
+	<div data-role="page" id="register-page" data-add-back-btn="true">
+		<div data-role="header">
+			<h1>Register</h1>
+		</div>
+		<div data-role="content">
+			<form>
+			<div data-role="fieldcontain">
+				<label for="register-email">Email:</label>
+	    		<input type="text" name="register-email" id="register-email" value=""  />
+			</div>	
+			<div data-role="fieldcontain">
+				<label for="register-pass">Password:</label>
+	    		<input type="password" name="register-pass" id="register-pass" value=""  />
+			</div>	
+			<div data-role="fieldcontain">
+				<label for="register-full-name">Full name:</label>
+	    		<input type="text" name="register-full-name" id="register-full-name" value=""  />
+			</div>	
+			<div data-role="fieldcontain">
+				<label for="register-user">Username:</label>
+	    		<input type="text" name="register-user" id="register-user" value=""  />
+			</div>	
+			<input type="button" value="Register" onClick="register()">
+			</form>
+		</div>
+	</div>
+	
 </body>
 </html>
