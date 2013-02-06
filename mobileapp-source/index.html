@@ -50,15 +50,18 @@
 	// to add
 	/////////////////////////////////////////////
 
-	var DEFAULT_LOCATION = new google.maps.LatLng(-37.816667, 144.966667);
-	var DEFAULT_ZOOM = 15;
+	//var DEFAULT_LOCATION = new google.maps.LatLng(-37.816667, 144.966667);
+	var DEFAULT_LOCATION = new google.maps.LatLng(-37.790658897800206, 144.99361038208008); // http://www.yarracity.vic.gov.au/about-yarra/ | http://www.communityfinder.net/index.php?theme=undefined&zoom=14&lat=-37.790658897800206&lng=144.99361038208008&subtype=all
+								
+	var DEFAULT_ZOOM = 14;
 	var ANONYMOUS_USER = 133;
 	var MAP_ID = "#map_canvas";
+	var MAP_SMALL_ID = "#map_canvas_small";
 	var drag_timer;
 	var config = {};
 		config.debug = true; // to print console logs
 		config.prefix = 'http://communityfinder.net/'; // for phonegap
-		//config.prefix = '../webapp-source/'; // for local testing when. comment out for deployment to phonegap
+		config.prefix = '../webapp-source/'; // for local testing when. comment out for deployment to phonegap
 		
 		userDataReset();
 
@@ -202,7 +205,12 @@
 			var lid = "";
 			//$("#listItems").prepend("Loading items...")
 			loadingMsg(true);
-
+			if(north_lat == south_lat || east_lng == west_lng){
+				north_lat += 0.05;
+				south_lat -= 0.05;
+				east_lng += 0.05;
+				west_lng -= 0.05;
+			}
 			// to fix 
 			// http://www.communityfinder.net/index.php?theme=undefined&zoom=14&lat=-37.790658897800206&lng=144.99361038208008&subtype=all
 
@@ -217,10 +225,10 @@
 					filter_text=farm&
 					filter_subtype=&
 					username=&
-					listing_id=		
+					listing_id=					
 			//*/		
 			
-			$.getJSON(config.prefix + 'data/get_markers.php', {format:"json",north_lat:north_lat, east_lng:east_lng, south_lat:south_lat, west_lng:west_lng, filter_text: filter_text, filter_subtype: filter_subtype, username:username, listing_id: lid}, function(data) {
+			$.getJSON(config.prefix + 'data/get_markers.php', {format:"json",north_lat:north_lat, east_lng:east_lng, south_lat:south_lat, west_lng:west_lng, filter_text: filter_text, filter_subtype: filter_subtype, username:username, listing_id: lid /*, limit: 20 //*/ }, function(data) {
 				$("#listItems").empty();
 				$(MAP_ID).gmap('clear', 'markers');
 
@@ -278,6 +286,7 @@
 		// reads meta-data in LI node and display on map
 		// http://jquery-ui-map.googlecode.com/svn/trunk/demos/jquery-google-maps-data-attribute.html
 		function loadMarkersFromList(){
+			$("#item_summary .details").hide();
 			$("[data-gmapping]").each(function(i,el) {
 				var data = $(el).data('gmapping');
 				$(MAP_ID).gmap('addMarker', {
@@ -290,7 +299,11 @@
 						$(marker).triggerEvent('click');
 					});
 				}).click(function() {
-					$(MAP_ID).gmap('openInfoWindow', { 'content': $(el).find('.info-box').parent().html() }, this);
+					var data = $(el).find('.info-box');
+					$("#item_summary .details").attr("data-parm", data.attr("data-parm")).show();
+					$("#item_summary .details .ui-btn-text").text(data.text());
+					 
+					// $(MAP_ID).gmap('openInfoWindow', { 'content': $(el).find('.info-box').parent().html() }, this);
 				});
 			});		
 		}
@@ -397,13 +410,23 @@
 			$.mobile.changePage( "#map-page", { transition: "slide"} );
 			
 		}
-		function openLoginPage() {
-			$.mobile.changePage( "#login-page", { transition: "slide"} );
+		// http://stackoverflow.com/questions/4535888/jquery-text-and-newlines
+		function htmlForTextWithEmbeddedNewlines(text) {
+		    var htmls = [];
+		    var lines = text.split(/\n/);
+		    // The temporary <div/> is to perform HTML entity encoding reliably.
+		    //
+		    // document.createElement() is *much* faster than jQuery('<div/>')
+		    // http://stackoverflow.com/questions/268490/
+		    //
+		    // You don't need jQuery but then you need to struggle with browser
+		    // differences in innerText/textContent yourself
+		    var tmpDiv = jQuery(document.createElement('div'));
+		    for (var i = 0 ; i < lines.length ; i++) {
+		        htmls.push(tmpDiv.text(lines[i]).html());
+		    }
+		    return htmls.join("<br>");
 		}
-		function openRegisterPage() {
-			$.mobile.changePage( "#register-page", { transition: "slide"} );
-		}
-
 		function openCommentsPage(lid){
 			if(!lid) lid = $("#listing_detail").attr("data-parm");
 			loadingMsg(true);
@@ -422,7 +445,7 @@
 					
 					var row = template.clone();
 					row.removeClass("template");
-					row.find(".message").text(comment_text);
+					row.find(".message").html(htmlForTextWithEmbeddedNewlines(comment_text));
 					row.find(".user").text(username);
 					row.find(".date").text(timestamp);
 					list.append(row);
@@ -458,7 +481,8 @@
 			});
 		}
 		function openDetailsPage(lid){
-
+			if(!lid) lid = $("#item_summary .details").attr("data-parm");
+			
 			$("#listing_detail").attr("data-parm", lid);
 			$.getJSON(config.prefix + 'data/get_markers.php?format=json&listing_id=' + lid, function(data) {
 				$("#lnkEdit").hide();
@@ -471,8 +495,8 @@
 					console.log("me: " + config.user_id);
 				}
 				var name = data.markers[0].name;
-				if(data.markers[0].edit == 1) $("#lnkEdit").show();
-				if(data.markers[0].delete == 1) $("#lnkDelete").show();
+				if(data.markers[0].edit && data.markers[0].edit == 1) $("#lnkEdit").show();
+				if(data.markers[0].delete && data.markers[0].delete == 1) $("#lnkDelete").show();
 				if(!name) name = '';
 				$('#name').html(name);
 				$('#description').html(data.markers[0].desc);
@@ -509,11 +533,11 @@
 				$('#www').html(value);
 				$('#www').attr('href', 'http://' + value);
 				
-				$('#map_canvas_small').gmap('clear', 'markers');
-				$('#map_canvas_small').gmap('addMarker', { /*id:'m_1',*/ 
+				$(MAP_SMALL_ID).gmap('clear', 'markers');
+				$(MAP_SMALL_ID).gmap('addMarker', { /*id:'m_1',*/ 
 						'position': data.markers[0].lat + ',' + data.markers[0].lng, 
 						'bounds': true});
-				$('#map_canvas_small').gmap('option', 'zoom', 14);
+				$(MAP_SMALL_ID).gmap('option', 'zoom', 14);
 				$("#map_canvas_small").gmap('option', 'center', new google.maps.LatLng( data.markers[0].lat, data.markers[0].lng))
 				
 
@@ -693,7 +717,7 @@ username: "user"
 			}
 		});
 		$(document).on('pageshow', "#listing_detail", function () {
-			$('#map_canvas_small').gmap('refresh');
+			$(MAP_SMALL_ID).gmap('refresh');
 		});		
 		$(document).on('pageshow', "#map-page", function () {
 			$(MAP_ID).gmap('refresh',1);
@@ -721,7 +745,7 @@ username: "user"
 
 						var row = template.clone();
 						row.removeClass("template");
-						row.find(".message").text(message);
+						row.find(".message").html(htmlForTextWithEmbeddedNewlines(message));
 						row.find(".user").text(user);
 						row.find(".date").text(timestamp);
 						list.append(row);
@@ -849,7 +873,6 @@ tags:,organic,transport,general,type of group:sustainability,type of group:type
 				openConversationPage($(this).attr("data-url"));
 			});
 			// item details page - 1
-
 			$("a.listing_link").live('click',function(e) {
 				loadingMsg(true);
 				var lid = $(this).attr("data-parm");
@@ -922,11 +945,23 @@ tags:,organic,transport,general,type of group:sustainability,type of group:type
 			///////////////////////////////////////////////////////////////////////////
 			// main map page - 0
 			///////////////////////////////////////////////////////////////////////////
-			openMapPage();
+			//openMapPage();
 			openSearchPage();
 		});
 
 
+		$(document).on('pagebeforeshow', "#more", function () {
+			$("#more-username").text("");
+			if(config.user_id){
+				$("#more-username").text(config.username);
+				$("#more .logged-in").show();
+				$("#more .logged-out").hide();
+			}
+			else{
+				$("#more .logged-out").show();
+				$("#more .logged-in").hide();
+			}
+		});		
 
 
 </script>
@@ -935,24 +970,14 @@ tags:,organic,transport,general,type of group:sustainability,type of group:type
 
 	<div data-role="page" id="search-page" data-add-back-btn="true">
 		<div data-role="header" data-position="fixed" data-id="head" id="headbar">
-			<h1>CommunityFinder</h1>
-				<a href="#toolbarPanel" data-rel="popup" data-transition="slide" data-position-to="window" data-role="button" class="ui-btn-right" data-icon="arrow-d">Menu</a>
-                        <div data-role="popup" id="toolbarPanel" data-corners="false" data-theme="none" data-shadow="false" data-tolerance="0,0" data-position-to="#">
-                        <div data-role="navbar">
-                                <ul>
-                                        <li><a href="#" onClick="openSearchPage();" data-icon="search">Find</a></li>
-                                        <li><a href="#" onClick="openMapPage();" data-icon="plus">Map</a></li>
-                                        <li><a id="lnkLogin" href="#login-page" data-rel="dialog">Login</a></li>
-                                        <li><a href="#register-page" data-rel="dialog">Register</a></li>
-                                        <li><a href="#logout-page">Logout</a></li>
-                                        <li><a href="#add-page" onClick="openAddPage()">Add</a></li>
-                                        <li><a href="#" onClick="openInboxPage()">Inbox</a></li>
-                                        <li><a href="#" onClick="loadMyMarkers()">Your Listings</a></li>
-                                        <li><a href="#" data-icon="gear">Settings</a></li>
-                                        <li><a href="#" data-icon="arrow-r">More</a></li>
-                                </ul>
-                        </div><!-- /navbar -->
-                    </div>
+            <div data-role="navbar">
+                <ul>
+                    <li><a href="#search-page" onClick="openSearchPage();" data-iconpos="left" data-mini="true" data-inline="true" data-icon="search"></a></li>
+                    <li><a href="#map-page" onClick="openMapPage();" data-iconpos="left" data-mini="true" data-inline="true" data-icon="grid"></a></li>
+                    <li><a href="#add-page" onClick="openAddPage()" data-iconpos="left" data-mini="true" data-inline="true" data-icon="plus"></a></li>
+                    <li><a href="#more" data-iconpos="left" data-icon="bars" data-inline="true" data-mini="true" data-rel="dialog" data-transition="slidedown"></a></li>
+                </ul>
+            </div><!-- /navbar -->
 		</div><!-- /header -->
 
 		<div data-role="content">
@@ -974,180 +999,49 @@ tags:,organic,transport,general,type of group:sustainability,type of group:type
 		</div><!-- /content -->
 	</div><!-- /page -->
 
-
-
-
-       <div data-role="page" id="map-page" data-add-back-btn="true" style="">
-                <div data-role="header" data-position="fixed" data-id="head" id="headbar">
-                        <h1>CommunityFinder</h1>
-			<a href="#toolbarPanel" data-rel="popup" data-transition="slide" data-position-to="window" data-role="button" class="ui-btn-right" data-icon="arrow-d">Menu</a>
-                        <div data-role="popup" id="toolbarPanel" data-corners="false" data-theme="none" data-shadow="false" data-tolerance="0,0" data-position-to="#">
-                        <div data-role="navbar">
-                                <ul>
-                                        <li><a href="#" onClick="openSearchPage();" data-icon="search">Find</a></li>
-                                        <li><a href="#" onClick="openMapPage();" data-icon="plus">Map</a></li>
-                                        <li><a href="#" data-icon="gear">Settings</a></li>
-                                        <li><a href="#" data-icon="arrow-r">More</a></li>
-                                </ul>
-                        </div><!-- /navbar -->
-                        </div>
-                </div><!-- /header -->
-
-                <div data-role="content">
-                        <div id="map_canvas"></div>
-                </div><!-- /content -->
-        </div><!-- /page -->
-
-
-
-	<div data-role="page" id="edit_detail" data-add-back-btn="true">
-		<div data-role="header" data-position="fixed" data-id="head" id="headbar">
-			<h1>CommunityFinder</h1>
-			<a href="#toolbarPanel" data-rel="popup" data-transition="slide" data-position-to="window" data-role="button" class="ui-btn-right" data-icon="arrow-d">Menu</a>
-			<div data-role="popup" id="toolbarPanel" data-corners="false" data-theme="none" data-shadow="false" data-tolerance="0,0" data-position-to="#">
-			<div data-role="navbar">
-
-				<ul>    
-					<li><a href="#" onClick="openSearchPage();" data-icon="search">Find</a></li>
-					<li><a href="#" onClick="openMapPage();" data-icon="plus">Map</a></li>
-					<li><a href="#" data-icon="gear">Settings</a></li>
-					<li><a href="#" data-icon="arrow-r">More</a></li>
-				</ul>
-			</div><!-- /navbar -->
-			</div>
-		</div><!-- /header -->
-		<div data-role="content">
-<!-- 
-	<table>
-	<tbody>
-	<tr><td><b>Category: </b></td><td><b id='edit-category'></b></td></tr>
-	<tr><td><b>Title</b></td><td> <input id='edit-name' name="name" value="Borderlands Cooperative" style="width: 220px;" class="fg-input ui-corner-all"><span title="" style="float: right;" class="tag_link ui-icon ui-icon-info "></span></td></tr>
-	<tr><td><b>Description: </b></td><td> <textarea id='edit-description' name="description" cols="35" rows="2" class="fg-input ui-corner-all" style="width: 220px;">Independent network for holistic community activism, sustainability and action research. </textarea><span title="" class="tag_link ui-icon ui-icon-info " style="float: right;"></span></td></tr>
-	<tr><td><b>Phone: </b></td><td> <input id='edit-phone' name="phone" value="" style="width: 220px;" class="fg-input ui-corner-all"></td></tr>
-	<tr><td><b>Address: </b></td><td> <input id='edit-address' name="address" value="" style="width: 220px;" class="fg-input ui-corner-all"></td></tr>
-	<tr><td colspan="2"><hr></td></tr>
-	<tr><td colspan="2"><b>Tags</b><span title="" class="tag_link ui-icon ui-icon-info " style="float: right;"></span></td></tr>
-	<tr><td><b>general:</b></td><td> <input name="tags_general" id="edit-tags_general" value="" class="fg-input ui-corner-all ui-autocomplete-input" style="width: 220px;" autocomplete="off"></td></tr>
-	<tr><td><b>type of group:</b></td><td> <input name="tags_type_of_group" id="edit-tags_type_of_group" value="" class="fg-input ui-corner-all ui-autocomplete-input" style="width: 220px;" autocomplete="off"></td></tr>
-	<tr><td></td><td style="color: grey;">ie. environment, social justice etc</td></tr>
-	<tr><td colspan="2"><hr></td></tr>
-	<tr><td><b>Wikipedia Page:</b></td><td> <input id="edit-wiki" name="wiki" value="" class="fg-input ui-corner-all ui-autocomplete-input" style="width: 220px;" autocomplete="off"><span title="Links listing to associated Wikipedia page, just start typing and we'll suggest exisiting pages on wikipedia" class="tag_link ui-icon ui-icon-info " style="float: right;"></span></td></tr>
-	<tr><td colspan="2"><hr></td></tr>
-	<tr><td><b>WWW (ie http://..):</b></td><td> <input id="edit-www" name="www" value="http://www.borderlands.org.au" class="fg-input ui-corner-all" style="width: 220px;"><span title="Links listing to an associated Web Site" class="tag_link ui-icon ui-icon-info " style="float: right;"></span></td></tr>
-	<tr><td><b>RSS: (ie http://..)</b></td><td> <input id="edit-rss" name="rss" value="" class="fg-input ui-corner-all" style="width: 220px;"></td></tr>
-	<tr><td colspan="2"><hr></td></tr>
-	<tr><td colspan="2">
 	
-	<input onclick="$('.invite_details').toggle();" type="checkbox" id="edit-is_invite" name="is_invite" class="fg-input ui-corner-all"> <b>Customise 'contact us' link</b></td></tr>
-	<tr class="invite_details" style="display: none;"><td colspan="2">Instead of using the built in inbox system, provide either an email address, or 'contact us' form url to customise the 'contact user' link on this listing.</td></tr>
-	<tr class="invite_details" style="display: none;"><td><b>Email:</b></td><td> 
-	<input id="edit-invite_email" name="invite_email" value="" size="35" class="fg-input ui-corner-all"> or </td></tr>
-	<tr class="invite_details" style="display: none;"><td><b>Contact URL:</b></td><td> </td></tr>
-	<tr><td colspan="2"><hr></td></tr></tbody>
-				</table>        
--->
-				<form>
-					Category: <b id='edit-category'></b>
 
-					<input id='edit-lat' type="hidden" >
-					<input id='edit-lng' type="hidden" >
-					<div>
-						<span title="" style="float: right;" class="tag_link ui-icon ui-icon-info "></span>
-						<label for="name">Title: </label>
-						<input id='edit-name' name="name" value="" class="fg-input ui-corner-all">
-					</div>
-					<div>
-						<span title="" class="tag_link ui-icon ui-icon-info " style="float: right;"></span>
-						<label for="description">Description: </label>
-						<textarea id='edit-description' name="description" cols="35" rows="2" class="fg-input ui-corner-all" ></textarea>
-					</div>
-					<div>
-						<label for="phone">Phone: </label>
-						<input id='edit-phone' name="phone" value="" class="fg-input ui-corner-all">
-					</div>
-					<div>
-						<label for="address">Address: </label>
-						<textarea id='edit-edit-address' name="address" cols="35" rows="2" class="fg-input ui-corner-all" ></textarea>
-					</div>
-					<div>
-						<label for="tags_general">Tags (general): </label>
-						<input name="tags_general" id="edit-tags_general" value="" class="fg-input ui-corner-all ui-autocomplete-input"  autocomplete="off">
-					</div>
-					<div>
-						<label for="tags_type_of_group">Tags (type of group): </label>
-						<input name="tags_type_of_group" id="edit-tags_type_of_group" value="" class="fg-input ui-corner-all ui-autocomplete-input"  autocomplete="off">
-						ie. environment, social justice etc
-					</div>
-					<div>
-						<span title="Links listing to associated Wikipedia page, just start typing and we'll suggest exisiting pages on wikipedia" class="tag_link ui-icon ui-icon-info " style="float: right;"></span>
-						<label for="wiki">Wikipedia Page:</label>
-						<input id="edit-wiki" name="wiki" value="" class="fg-input ui-corner-all ui-autocomplete-input"  autocomplete="off">
-					</div>
-					<div>
-						<span title="Links listing to an associated Web Site" class="tag_link ui-icon ui-icon-info " style="float: right;"></span>
-						<label for="www">WWW (ie http://..): </label>
-						<input id="edit-www" name="www" value="" class="fg-input ui-corner-all" >
-					</div>
-					<div>
-						<label for="rss">RSS: (ie http://..) </label>
-						<input id="edit-rss" name="rss" value="" class="fg-input ui-corner-all" >
-					</div>
-					
-					<div data-role="fieldcontain">
-						<input onclick="$('.invite_details').toggle();" type="checkbox" id="edit-is_invite" name="is_invite" class="fg-input ui-corner-all">
-						<label for="is_invite">Customise 'contact us' link</label>
-					</div>
-					<div class="invite_details" style="display: none;">
-						Instead of using the built in inbox system, provide either an email address, or 'contact us' form url to customise the 'contact user' link on this listing.
-					</div>	
-					<div class="invite_details" style="display: none;">
-						<label for="invite_email">Email:</label>
-						<input id="edit-invite_email" name="invite_email" value="" class="fg-input ui-corner-all"> or 
-					</div>	
-					<div class="invite_details" style="display: none;">
-						<label for="invite_url">Contact URL:</label>
-						<input id="edit-invite_url" name="invite_url" value="" class="fg-input ui-corner-all">
-					</div>	
+   <div data-role="page" id="map-page" data-add-back-btn="true" style="">
+		<div data-role="header" data-position="fixed" data-id="head" id="headbar">
+            <div data-role="navbar">
+                <ul>
+                    <li><a href="#search-page" onClick="openSearchPage();" data-iconpos="left" data-mini="true" data-inline="true" data-icon="search"></a></li>
+                    <li><a href="#map-page" onClick="openMapPage();" data-iconpos="left" data-mini="true" data-inline="true" data-icon="grid"></a></li>
+                    <li><a href="#add-page" onClick="openAddPage()" data-iconpos="left" data-mini="true" data-inline="true" data-icon="plus"></a></li>
+                    <li><a href="#more" data-iconpos="left" data-icon="bars" data-inline="true" data-mini="true" data-rel="dialog" data-transition="slidedown"></a></li>
+                </ul>
+            </div><!-- /navbar -->
+		</div><!-- /header -->
 
-					<input type="button" value="Save" id="btnEdit">
-				</form>
-				
-			<div>
-			</div>
-		</div>
-	</div>
+        <div data-role="content">
+                <div id="map_canvas"></div>
+                <div id="item_summary">
+					<div data-role="controlgroup"  data-type="horizontal">
+						<a href="#listing_detail" onclick="openDetailsPage()" data-role="button" data-icon="info" data-iconpos="left" data-theme="c" data-inline="true" class="details">Item</a>
+						<!--
+						<a href="index.html" data-role="button" data-icon="arrow-l" data-iconpos="left" data-theme="c" data-inline="true">&nbsp;</a>
 
-	<div data-role="dialog" id="delete-page">
-		<div data-role="header">
-			<h1>Delete Marker</h1>
-		</div>
+						<a href="index.html" data-role="button" data-icon="arrow-r" data-iconpos="left" data-theme="c" data-inline="true">&nbsp;</a>
+						-->
+					</div>
+                </div>
+        </div><!-- /content -->
+	</div><!-- /page -->
 
-		<div data-role="content">
-			<h3>Delete Marker?</h3>
-			<div data-inline="true">
-			    <a href="#" data-role="button" data-rel="back">Cancel</a>
-			    <a href="#" data-role="button" data-theme="b" onclick="deleteMarker(); return false;">Delete</a>
-			</div>
-		</div>
-	</div>
-	<!-- /page edit_details-->
+
         
 	<div data-role="page" id="listing_detail" data-add-back-btn="true">
 		<div data-role="header" data-position="fixed" data-id="head" id="headbar">
-                        <h1>CommunityFinder</h1>
-                        <a href="#toolbarPanel" data-rel="popup" data-transition="slide" data-position-to="window" data-role="button" class="ui-btn-right" data-icon="arrow-d">Menu</a>
-                        <div data-role="popup" id="toolbarPanel" data-corners="false" data-theme="none" data-shadow="false" data-tolerance="0,0" data-position-to="#">
-                        <div data-role="navbar">
+            <div data-role="navbar">
+                <ul>
+                    <li><a href="#search-page" onClick="openSearchPage();" data-iconpos="left" data-mini="true" data-inline="true" data-icon="search"></a></li>
+                    <li><a href="#map-page" onClick="openMapPage();" data-iconpos="left" data-mini="true" data-inline="true" data-icon="grid"></a></li>
+                    <li><a href="#add-page" onClick="openAddPage()" data-iconpos="left" data-mini="true" data-inline="true" data-icon="plus"></a></li>
+                    <li><a href="#more" data-iconpos="left" data-icon="bars" data-inline="true" data-mini="true" data-rel="dialog" data-transition="slidedown"></a></li>
+                </ul>
+            </div><!-- /navbar -->
+		</div><!-- /header -->
 
-                                <ul>    
-                                        <li><a href="#" onClick="openSearchPage();" data-icon="search">Find</a></li>
-                                        <li><a href="#" onClick="openMapPage();" data-icon="plus">Map</a></li>
-                                        <li><a href="#" data-icon="gear">Settings</a></li>
-                                        <li><a href="#" data-icon="arrow-r">More</a></li>
-                                </ul>
-                        </div><!-- /navbar -->
-                        </div>
-                </div><!-- /header -->
 		<div data-role="content">
 			<h1 id="name">CommunityFinder</h1>
 			<div class="ui-grid-a">
@@ -1279,6 +1173,125 @@ old code
 
 	</div><!-- /page -->
 
+
+<div id="more" data-role="page" class="dialog-actionsheet">
+		<div data-role="content" data-theme="a">
+			<h1 class="logged-in" id="more-username"></h1>
+	        <a class="logged-out" href="#login-page" data-theme="b" data-role="button" data-rel="dialog" data-transition="slidedown" >Login</a>
+	        <a class="logged-out" href="#register-page" data-theme="b" data-role="button" data-rel="dialog" data-transition="slidedown" >Register</a>
+	        <a class="logged-in" href="#" onClick="openInboxPage()" data-theme="b" data-role="button">Inbox</a>
+	        <a class="logged-in" href="#" onClick="loadMyMarkers()"data-theme="b" data-role="button">Your Listings</a>
+	        <br class="logged-in" >
+	        <a class="logged-in" href="#logout-page" data-theme="b" data-role="button" data-rel="dialog" >Logout</a>
+	        <br>
+			<a href="#" data-role="button" data-rel="back" data-theme="a">Cancel</a>    
+		</div>
+	</div>
+
+	<div data-role="page" id="edit_detail" data-add-back-btn="true">
+		<div data-role="header" data-position="fixed" data-id="head" id="headbar">
+			<h1>CommunityFinder</h1>
+			<a href="#toolbarPanel" data-rel="popup" data-transition="slide" data-position-to="window" data-role="button" class="ui-btn-right" data-icon="arrow-d">Menu</a>
+			<div data-role="popup" id="toolbarPanel" data-corners="false" data-theme="none" data-shadow="false" data-tolerance="0,0" data-position-to="#">
+			<div data-role="navbar">
+
+				<ul>    
+					<li><a href="#" onClick="openSearchPage();" data-icon="search">Find</a></li>
+					<li><a href="#" onClick="openMapPage();" data-icon="plus">Map</a></li>
+					<li><a href="#" data-icon="gear">Settings</a></li>
+					<li><a href="#more" data-icon="arrow-r" data-role="button" data-inline="true" data-rel="dialog" data-transition="slidedown">More</a></li>
+				</ul>
+			</div><!-- /navbar -->
+			</div>
+		</div><!-- /header -->
+		<div data-role="content">
+				<form>
+					Category: <b id='edit-category'></b>
+
+					<input id='edit-lat' type="hidden" >
+					<input id='edit-lng' type="hidden" >
+					<div>
+						<span title="" style="float: right;" class="tag_link ui-icon ui-icon-info "></span>
+						<label for="name">Title: </label>
+						<input id='edit-name' name="name" value="" class="fg-input ui-corner-all">
+					</div>
+					<div>
+						<span title="" class="tag_link ui-icon ui-icon-info " style="float: right;"></span>
+						<label for="description">Description: </label>
+						<textarea id='edit-description' name="description" cols="35" rows="2" class="fg-input ui-corner-all" ></textarea>
+					</div>
+					<div>
+						<label for="phone">Phone: </label>
+						<input id='edit-phone' name="phone" value="" class="fg-input ui-corner-all">
+					</div>
+					<div>
+						<label for="address">Address: </label>
+						<textarea id='edit-edit-address' name="address" cols="35" rows="2" class="fg-input ui-corner-all" ></textarea>
+					</div>
+					<div>
+						<label for="tags_general">Tags (general): </label>
+						<input name="tags_general" id="edit-tags_general" value="" class="fg-input ui-corner-all ui-autocomplete-input"  autocomplete="off">
+					</div>
+					<div>
+						<label for="tags_type_of_group">Tags (type of group): </label>
+						<input name="tags_type_of_group" id="edit-tags_type_of_group" value="" class="fg-input ui-corner-all ui-autocomplete-input"  autocomplete="off">
+						ie. environment, social justice etc
+					</div>
+					<div>
+						<span title="Links listing to associated Wikipedia page, just start typing and we'll suggest exisiting pages on wikipedia" class="tag_link ui-icon ui-icon-info " style="float: right;"></span>
+						<label for="wiki">Wikipedia Page:</label>
+						<input id="edit-wiki" name="wiki" value="" class="fg-input ui-corner-all ui-autocomplete-input"  autocomplete="off">
+					</div>
+					<div>
+						<span title="Links listing to an associated Web Site" class="tag_link ui-icon ui-icon-info " style="float: right;"></span>
+						<label for="www">WWW (ie http://..): </label>
+						<input id="edit-www" name="www" value="" class="fg-input ui-corner-all" >
+					</div>
+					<div>
+						<label for="rss">RSS: (ie http://..) </label>
+						<input id="edit-rss" name="rss" value="" class="fg-input ui-corner-all" >
+					</div>
+					
+					<div data-role="fieldcontain">
+						<input onclick="$('.invite_details').toggle();" type="checkbox" id="edit-is_invite" name="is_invite" class="fg-input ui-corner-all">
+						<label for="is_invite">Customise 'contact us' link</label>
+					</div>
+					<div class="invite_details" style="display: none;">
+						Instead of using the built in inbox system, provide either an email address, or 'contact us' form url to customise the 'contact user' link on this listing.
+					</div>	
+					<div class="invite_details" style="display: none;">
+						<label for="invite_email">Email:</label>
+						<input id="edit-invite_email" name="invite_email" value="" class="fg-input ui-corner-all"> or 
+					</div>	
+					<div class="invite_details" style="display: none;">
+						<label for="invite_url">Contact URL:</label>
+						<input id="edit-invite_url" name="invite_url" value="" class="fg-input ui-corner-all">
+					</div>	
+
+					<input type="button" value="Save" id="btnEdit">
+				</form>
+				
+			<div>
+			</div>
+		</div>
+	</div>
+
+	<div data-role="dialog" id="delete-page">
+		<div data-role="header">
+			<h1>Delete Marker</h1>
+		</div>
+
+		<div data-role="content">
+			<h3>Delete Marker?</h3>
+			<div data-inline="true">
+			    <a href="#" data-role="button" data-rel="back">Cancel</a>
+			    <a href="#" data-role="button" data-theme="b" onclick="deleteMarker(); return false;">Delete</a>
+			</div>
+		</div>
+	</div>
+	<!-- /page edit_details-->
+
+
 	<div data-role="page" id="inbox-page" data-add-back-btn="true">
 		<div data-role="header" data-position="fixed" data-id="head">
 			<h1>Inbox</h1>
@@ -1334,22 +1347,21 @@ old code
 	        <a data-role="button" data-rel="back">Ok</a>
 	    </div>
 	</div>
-	<div data-role="page" id="login-page" data-add-back-btn="true">
+	<div data-role="dialog" id="login-page" data-add-back-btn="true">
 		<div data-role="header">
 			<h1>Login</h1>
 		</div>
-
 		<div data-role="content">
 			<form>
-			<div data-role="fieldcontain">
-				<label for="login-user">Username / Email:</label>
-	    		<input type="text" name="login-user" id="login-user" value=""  />
-			</div>	
-			<div data-role="fieldcontain">
-				<label for="login-pass">Password:</label>
-	    		<input type="password" name="login-pass" id="login-pass" value=""  />
-			</div>	
-			<input type="button" value="Login" onClick="login()">
+				<div data-role="fieldcontain">
+					<label for="login-user">Username / Email:</label>
+		    		<input type="text" name="login-user" id="login-user" value=""  />
+				</div>	
+				<div data-role="fieldcontain">
+					<label for="login-pass">Password:</label>
+		    		<input type="password" name="login-pass" id="login-pass" value=""  />
+				</div>	
+				<input type="submit" value="Login" onClick="login(); return false;">
 			</form>
 
 		</div>
@@ -1360,23 +1372,23 @@ old code
 		</div>
 		<div data-role="content">
 			<form>
-			<div data-role="fieldcontain">
-				<label for="register-email">Email:</label>
-	    		<input type="text" name="register-email" id="register-email" value=""  />
-			</div>	
-			<div data-role="fieldcontain">
-				<label for="register-pass">Password:</label>
-	    		<input type="password" name="register-pass" id="register-pass" value=""  />
-			</div>	
-			<div data-role="fieldcontain">
-				<label for="register-full-name">Full name:</label>
-	    		<input type="text" name="register-full-name" id="register-full-name" value=""  />
-			</div>	
-			<div data-role="fieldcontain">
-				<label for="register-user">Username:</label>
-	    		<input type="text" name="register-user" id="register-user" value=""  />
-			</div>	
-			<input type="button" value="Register" onClick="register()">
+				<div data-role="fieldcontain">
+					<label for="register-email">Email:</label>
+		    		<input type="text" name="register-email" id="register-email" value=""  />
+				</div>	
+				<div data-role="fieldcontain">
+					<label for="register-pass">Password:</label>
+		    		<input type="password" name="register-pass" id="register-pass" value=""  />
+				</div>	
+				<div data-role="fieldcontain">
+					<label for="register-full-name">Full name:</label>
+		    		<input type="text" name="register-full-name" id="register-full-name" value=""  />
+				</div>	
+				<div data-role="fieldcontain">
+					<label for="register-user">Username:</label>
+		    		<input type="text" name="register-user" id="register-user" value=""  />
+				</div>	
+				<input type="submit" value="Register" onClick="register(); return false;">
 			</form>
 		</div>
 	</div>

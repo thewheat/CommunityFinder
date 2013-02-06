@@ -16,12 +16,28 @@ $listing_id = ($_GET['listing_id']) ? $_GET['listing_id'] : '';
 
 $format = ($_GET['format']) ? $_GET['format'] : 'xml';
 
+$limit = ($_GET['limit']) ? $_GET['limit'] : '';
+$count = ($_GET['count']) ? $_GET['count'] : 20;
+$page = ($_GET['page']) ? $_GET['page'] : '';
+/*
+function get1($n1, $n2){
+	if(intval($n1) == intval($n2)){
+		$count = 0;
+		$tmp = intval($n1);
+		for(;$tmp > 1; $count++, $tmp /= 10);
 
+	}
+	else{
+		return intval($n2) + ((intval($n1) - intval($n2) / 2);
+	}
+}
+//*/
 		$mysqli = new mysqli($SITE['DB_HOST'], $SITE['DB_USERNAME'], $SITE['DB_PW'], $SITE['DB_NAME']);
 		if (!mysqli_connect_errno()) {
 				$types = '';
 				$bindings = '';
-				$query =  " SELECT DISTINCT marker.lat, marker.lng, marker.title, marker.description, marker.marker_id, user.username, type.type_cd, subtype.subtype_cd, subtype.subtype_name, marker.www, marker.wiki, marker.rss, marker.datetime_on, marker.start_datetime, marker.end_datetime, marker.alt_contact_on, marker.alt_contact_email, marker.alt_contact_url, marker.alt_contact_text, marker.address, marker.phone, marker_to_user.user_id
+				$query_select =  " SELECT DISTINCT marker.lat, marker.lng, marker.title, marker.description, marker.marker_id, user.username, type.type_cd, subtype.subtype_cd, subtype.subtype_name, marker.www, marker.wiki, marker.rss, marker.datetime_on, marker.start_datetime, marker.end_datetime, marker.alt_contact_on, marker.alt_contact_email, marker.alt_contact_url, marker.alt_contact_text, marker.address, marker.phone, marker_to_user.user_id ";
+				$query =  " 
 							FROM marker
 							INNER JOIN marker_to_user ON marker.marker_id = marker_to_user.marker_id
 							INNER JOIN user ON marker_to_user.user_id = user.user_id
@@ -117,10 +133,35 @@ $format = ($_GET['format']) ? $_GET['format'] : 'xml';
 						$types .= 'i';
 						$bindings .= '$listing_id, ';
 				}			
-				$query .= "ORDER BY marker.lat, marker.lng ";
 				
-				
-				if($stmt = $mysqli->prepare($query)) {
+				$order = '';
+				if(is_numeric($page)){
+					$query .= " limit  " . ($page-1) * $count . " , " . ($page-0) * $count;
+				}
+				else if(is_numeric($limit)){
+					$clat = ($south_lat + (($north_lat - $south_lat) / 2));
+					$clng = ($west_lng + (($east_lng - $west_lng) / 2));
+
+					$order .= "ORDER BY (marker.lat - $clat)*(marker.lat - $clat) + (marker.lng - $clng)*(marker.lng - $clng) asc";
+					$order .= " limit  0," . $limit;
+				}
+				else {
+					$order .= "ORDER BY marker.lat, marker.lng ";
+				}
+
+#echo $query . $order;
+				if($stmt = $mysqli->prepare("SELECT count(marker.marker_id) " . $query)) {
+						$bindings = preg_replace('/,\s$/', '', $bindings);
+						$bind_php = '$stmt->bind_param("' . $types . '", ' . $bindings . ');';
+						eval($bind_php); // OH THE HORROR
+						$stmt->execute();		
+						$stmt->store_result();
+						$stmt->bind_result($result_count);
+						$stmt->fetch();
+				}	
+
+
+				if($stmt = $mysqli->prepare($query_select . $query . $order)) {
 						$bindings = preg_replace('/,\s$/', '', $bindings);
 						$bind_php = '$stmt->bind_param("' . $types . '", ' . $bindings . ');';
 						eval($bind_php); // OH THE HORROR
@@ -209,21 +250,23 @@ $format = ($_GET['format']) ? $_GET['format'] : 'xml';
 
 									
 					if ($format == 'xml') {	
-							printf('<marker lat="%f" lng="%f" name="%s" description="%s" lid="%d" username="%s" type="%s" subtype="%s" subtype_name="%s" www="%s" wiki="%s" rss="%s" datetime_on="%d" start_datetime="%s" end_datetime="%s" is_invite="%d" invite_email="%s" invite_url="%s" invite_text="%s" address="%s" phone="%s" tags="%s" user_id="%s" edit="%s" delete="%s" />', 
+							printf('<marker lat="%f" lng="%f" name="%s" description="%s" lid="%d" username="%s" type="%s" subtype="%s" subtype_name="%s" www="%s" wiki="%s" rss="%s" datetime_on="%d" start_datetime="%s" end_datetime="%s" is_invite="%d" invite_email="%s" invite_url="%s" invite_text="%s" address="%s" phone="%s" tags="%s" user_id="%s" edit="%s" delete="%s" result_count="%s"/>', 
 											$lat, $lng, stripslashes($title), stripslashes($description), $marker_id, $username, 
 											$type_cd, $subtype_cd, $subtype_name, $www, $wiki, $rss, $datetime_on, $start_datetime, $end_datetime, $alt_contact_on, 
-											$alt_contact_email, $alt_contact_url, $alt_contact_text, $address, $phone, $tags, $user_id, $edit, $delete);
+											$alt_contact_email, $alt_contact_url, $alt_contact_text, $address, $phone, $tags, $user_id, $edit, $delete, $result_count);
 							print("\n");
 					}
 					else if ($format == 'json') {
 						$markers["markers"][] = array("lat" => $lat, "lng" => $lng, "name" => stripslashes($title), "desc" => stripslashes($description), "lid" => $marker_id, "username" => $username, 
 											"type" => $type_cd, "subtype" => $subtype_cd, "subtype_name" => $subtype_name, "www" => $www, "wiki" => $wiki, "rss" => $rss, 
-											"ac_on" => $alt_contact_on, "ac_email" => $alt_contact_email, "ac_url" => $alt_contact_url, "ac_text" => $alt_contact_text, "address" => $address, "phone" => $phone, "tags" => $tags, "user_id" => $user_id, "edit" => $edit, "delete" => $delete);
+											"ac_on" => $alt_contact_on, "ac_email" => $alt_contact_email, "ac_url" => $alt_contact_url, "ac_text" => $alt_contact_text, "address" => $address, "phone" => $phone, "tags" => $tags
+											, "user_id" => $user_id, "edit" => $edit, "delete" => $delete, "result_count" => $result_count
+											);
 					}
 					else if ($format == 'csv') {
-							printf('"%s","%s","%f","%f","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s"', 
+							printf('"%s","%s","%f","%f","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s", "%s"', 
 								stripslashes($title), stripslashes($description), $lat, $lng, 
-								$username, $subtype_name, $phone, $address, $www, $rss, $tags, $user_id, $edit, $delete);
+								$username, $subtype_name, $phone, $address, $www, $rss, $tags, $user_id, $edit, $delete, $result_count);
 							print("\n");
 					}	
 					else if ($format == 'kml') {
