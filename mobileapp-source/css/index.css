@@ -154,7 +154,7 @@ ul#listItems {
 a.listing_link {
 	color: #0000ff;
 }
-#map_canvas { height: 90%; min-height: 400px; width: 95%; padding: 0; margin: 0 auto;}
+#map_canvas, #map_canvas_add { height: 90%; min-height: 400px; width: 95%; padding: 0; margin: 0 auto;}
 
 
 #map_canvas_small
@@ -184,3 +184,11 @@ body .ui-li .ui-li-desc {
     white-space: normal;
 }
 
+.ui-icon.ui-icon-menu {
+    background-image: url("../images/icons-18-white_1.3.0_rc1.png");
+    background-position: -788px -1px;
+}
+.ui-icon.ui-icon-globe {
+    background-image: url("../images/icons-18-white_1.3.0_rc1.png");
+    background-position: -718px -1px;
+}

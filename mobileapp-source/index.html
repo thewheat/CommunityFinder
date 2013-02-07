@@ -56,6 +56,7 @@
 	var DEFAULT_ZOOM = 14;
 	var ANONYMOUS_USER = 133;
 	var MAP_ID = "#map_canvas";
+	var MAP_ID_add = "#map_canvas_add";
 	var MAP_SMALL_ID = "#map_canvas_small";
 	var drag_timer;
 	var config = {};
@@ -315,8 +316,7 @@
 		function setTimer(time){
 			resetTimer();
 			drag_timer = setTimeout(function(){ 
-				if(!config.add_marker)
-					loadMarkers($(MAP_ID).gmap('option', 'center')); 
+				loadMarkers($(MAP_ID).gmap('option', 'center')); 
 			}, (time ? time : 1000));
 		}
 		// dragging/zooming auto refresh functions - 0
@@ -400,15 +400,13 @@
 			$(MAP_ID).gmap('refresh', 1);
 		}
 		function openAddPage(){
-			openMapPage(true);
-		}
-		function openMapPage(add) {
-			if(add){
-				config.add_marker = true; // blocks refresh
-				$(MAP_ID).gmap('clear', 'markers');
-			}
+			$(MAP_ID_add).gmap('clear', 'markers');
 			$.mobile.changePage( "#map-page", { transition: "slide"} );
-			
+			$(MAP_ID_add).gmap('refresh', 1);
+		}
+		function openMapPage() {
+			$.mobile.changePage( "#map-page", { transition: "slide"} );
+			$(MAP_ID).gmap('refresh', 1);
 		}
 		// http://stackoverflow.com/questions/4535888/jquery-text-and-newlines
 		function htmlForTextWithEmbeddedNewlines(text) {
@@ -432,7 +430,7 @@
 			loadingMsg(true);
 			$.get(config.prefix+'data/get_marker_comments.php', {lid: lid}, function(data) {	
 				var flag = 0;
-
+				$("#name-comments").text($("#name").text());
 				var list = $("#comments-page .list").eq(0);
 				var template = $("#comments-page").find(".template");
 				list.empty();
@@ -485,8 +483,6 @@
 			
 			$("#listing_detail").attr("data-parm", lid);
 			$.getJSON(config.prefix + 'data/get_markers.php?format=json&listing_id=' + lid, function(data) {
-				$("#lnkEdit").hide();
-				$("#lnkDelete").hide();
 
 
 				if(config.debug) {
@@ -495,8 +491,14 @@
 					console.log("me: " + config.user_id);
 				}
 				var name = data.markers[0].name;
-				if(data.markers[0].edit && data.markers[0].edit == 1) $("#lnkEdit").show();
-				if(data.markers[0].delete && data.markers[0].delete == 1) $("#lnkDelete").show();
+				if(data.markers[0].edit && data.markers[0].edit == 1) 
+					$("#lnkEdit").show();
+				else
+					$("#lnkEdit").hide();
+				if(data.markers[0].delete && data.markers[0].delete == 1) 
+					$("#lnkDelete").show();
+				else
+					$("#lnkDelete").hide();
 				if(!name) name = '';
 				$('#name').html(name);
 				$('#description').html(data.markers[0].desc);
@@ -718,9 +720,12 @@ username: "user"
 		});
 		$(document).on('pageshow', "#listing_detail", function () {
 			$(MAP_SMALL_ID).gmap('refresh');
-		});		
+		});
+		$(document).on('pageshow', "#add-page", function () {
+			$(MAP_ID_add).gmap('refresh');
+		});
 		$(document).on('pageshow', "#map-page", function () {
-			$(MAP_ID).gmap('refresh',1);
+			$(MAP_ID).gmap('refresh');
 		});		
 		function openConversationPage(conv_id){
 			loadingMsg(true);
@@ -928,7 +933,6 @@ tags:,organic,transport,general,type of group:sustainability,type of group:type
 				$(map).click(function(e){
 					if(config.debug) console.log(e);
 					if(config.add_marker){
-
 						addListing({lat: e.latLng.lat(), lng: e.latLng.lng(), subtype: 'art and culture - ot'});
 					}
 				});
@@ -941,6 +945,11 @@ tags:,organic,transport,general,type of group:sustainability,type of group:type
 					setTimer();
 				});
 			});
+			$(MAP_ID_add).gmap({'center': DEFAULT_LOCATION, 'zoom': DEFAULT_ZOOM, 'mapTypeControl': false}).bind('init', function(evt, map) {
+				$(map).click(function(e){
+					addListing({lat: e.latLng.lat(), lng: e.latLng.lng(), subtype: 'art and culture - ot'});
+				});
+			});			
 			// init map - 0
 			///////////////////////////////////////////////////////////////////////////
 			// main map page - 0
@@ -970,12 +979,12 @@ tags:,organic,transport,general,type of group:sustainability,type of group:type
 
 	<div data-role="page" id="search-page" data-add-back-btn="true">
 		<div data-role="header" data-position="fixed" data-id="head" id="headbar">
-            <div data-role="navbar">
+            <div data-role="navbar" >
                 <ul>
-                    <li><a href="#search-page" onClick="openSearchPage();" data-iconpos="left" data-mini="true" data-inline="true" data-icon="search"></a></li>
-                    <li><a href="#map-page" onClick="openMapPage();" data-iconpos="left" data-mini="true" data-inline="true" data-icon="grid"></a></li>
-                    <li><a href="#add-page" onClick="openAddPage()" data-iconpos="left" data-mini="true" data-inline="true" data-icon="plus"></a></li>
-                    <li><a href="#more" data-iconpos="left" data-icon="bars" data-inline="true" data-mini="true" data-rel="dialog" data-transition="slidedown"></a></li>
+                    <li><a href="#search-page" onClick="openSearchPage();" data-mini="true" data-icon="search"></a></li>
+                    <li><a href="#map-page" onClick="openMapPage();" data-mini="true" data-icon="globe"></a></li>
+                    <li><a href="#add-page" onClick="openAddPage()" data-mini="true" data-icon="plus"></a></li>
+                    <li><a href="#more" data-icon="menu" data-mini="true" data-rel="dialog" data-transition="slidedown"></a></li>
                 </ul>
             </div><!-- /navbar -->
 		</div><!-- /header -->
@@ -1003,12 +1012,12 @@ tags:,organic,transport,general,type of group:sustainability,type of group:type
 
    <div data-role="page" id="map-page" data-add-back-btn="true" style="">
 		<div data-role="header" data-position="fixed" data-id="head" id="headbar">
-            <div data-role="navbar">
+            <div data-role="navbar" >
                 <ul>
-                    <li><a href="#search-page" onClick="openSearchPage();" data-iconpos="left" data-mini="true" data-inline="true" data-icon="search"></a></li>
-                    <li><a href="#map-page" onClick="openMapPage();" data-iconpos="left" data-mini="true" data-inline="true" data-icon="grid"></a></li>
-                    <li><a href="#add-page" onClick="openAddPage()" data-iconpos="left" data-mini="true" data-inline="true" data-icon="plus"></a></li>
-                    <li><a href="#more" data-iconpos="left" data-icon="bars" data-inline="true" data-mini="true" data-rel="dialog" data-transition="slidedown"></a></li>
+                    <li><a href="#search-page" onClick="openSearchPage();" data-mini="true" data-icon="search"></a></li>
+                    <li><a href="#map-page" onClick="openMapPage();" data-mini="true" data-icon="globe"></a></li>
+                    <li><a href="#add-page" onClick="openAddPage()" data-mini="true" data-icon="plus"></a></li>
+                    <li><a href="#more" data-icon="menu" data-mini="true" data-rel="dialog" data-transition="slidedown"></a></li>
                 </ul>
             </div><!-- /navbar -->
 		</div><!-- /header -->
@@ -1027,17 +1036,33 @@ tags:,organic,transport,general,type of group:sustainability,type of group:type
                 </div>
         </div><!-- /content -->
 	</div><!-- /page -->
+   	<div data-role="page" id="add-page" data-add-back-btn="true" style="">
+		<div data-role="header" data-position="fixed" data-id="head" id="headbar">
+            <div data-role="navbar" >
+                <ul>
+                    <li><a href="#search-page" onClick="openSearchPage();" data-mini="true" data-icon="search"></a></li>
+                    <li><a href="#map-page" onClick="openMapPage();" data-mini="true" data-icon="globe"></a></li>
+                    <li><a href="#add-page" onClick="openAddPage()" data-mini="true" data-icon="plus"></a></li>
+                    <li><a href="#more" data-icon="menu" data-mini="true" data-rel="dialog" data-transition="slidedown"></a></li>
+                </ul>
+            </div><!-- /navbar -->
+		</div><!-- /header -->
+
+        <div data-role="content">
+                <div id="map_canvas_add"></div>
+        </div><!-- /content -->
+	</div><!-- /page -->
 
 
         
 	<div data-role="page" id="listing_detail" data-add-back-btn="true">
 		<div data-role="header" data-position="fixed" data-id="head" id="headbar">
-            <div data-role="navbar">
+            <div data-role="navbar" >
                 <ul>
-                    <li><a href="#search-page" onClick="openSearchPage();" data-iconpos="left" data-mini="true" data-inline="true" data-icon="search"></a></li>
-                    <li><a href="#map-page" onClick="openMapPage();" data-iconpos="left" data-mini="true" data-inline="true" data-icon="grid"></a></li>
-                    <li><a href="#add-page" onClick="openAddPage()" data-iconpos="left" data-mini="true" data-inline="true" data-icon="plus"></a></li>
-                    <li><a href="#more" data-iconpos="left" data-icon="bars" data-inline="true" data-mini="true" data-rel="dialog" data-transition="slidedown"></a></li>
+                    <li><a href="#search-page" onClick="openSearchPage();" data-mini="true" data-icon="search"></a></li>
+                    <li><a href="#map-page" onClick="openMapPage();" data-mini="true" data-icon="globe"></a></li>
+                    <li><a href="#add-page" onClick="openAddPage()" data-mini="true" data-icon="plus"></a></li>
+                    <li><a href="#more" data-icon="menu" data-mini="true" data-rel="dialog" data-transition="slidedown"></a></li>
                 </ul>
             </div><!-- /navbar -->
 		</div><!-- /header -->
@@ -1149,7 +1174,9 @@ old code
 			<h1>Comments</h1>
 		</div>
 		<div data-role="content">
+			<h2 id="name-comments"></h2>
 			<ul class="list" data-role="listview" data-theme="d" data-divider-theme="d">
+		        <li data-role="list-divider">You need to select a page:</li> 
 			</ul>
 			<ul data-role="listview" data-theme="d" data-divider-theme="d">
 				<li>
@@ -1193,16 +1220,15 @@ old code
 			<h1>CommunityFinder</h1>
 			<a href="#toolbarPanel" data-rel="popup" data-transition="slide" data-position-to="window" data-role="button" class="ui-btn-right" data-icon="arrow-d">Menu</a>
 			<div data-role="popup" id="toolbarPanel" data-corners="false" data-theme="none" data-shadow="false" data-tolerance="0,0" data-position-to="#">
-			<div data-role="navbar">
-
-				<ul>    
-					<li><a href="#" onClick="openSearchPage();" data-icon="search">Find</a></li>
-					<li><a href="#" onClick="openMapPage();" data-icon="plus">Map</a></li>
-					<li><a href="#" data-icon="gear">Settings</a></li>
-					<li><a href="#more" data-icon="arrow-r" data-role="button" data-inline="true" data-rel="dialog" data-transition="slidedown">More</a></li>
-				</ul>
-			</div><!-- /navbar -->
-			</div>
+            <div data-role="navbar" >
+                <ul>
+                    <li><a href="#search-page" onClick="openSearchPage();" data-mini="true" data-icon="search"></a></li>
+                    <li><a href="#map-page" onClick="openMapPage();" data-mini="true" data-icon="globe"></a></li>
+                    <li><a href="#add-page" onClick="openAddPage()" data-mini="true" data-icon="plus"></a></li>
+                    <li><a href="#more" data-icon="menu" data-mini="true" data-rel="dialog" data-transition="slidedown"></a></li>
+                </ul>
+            </div><!-- /navbar -->
+		</div>
 		</div><!-- /header -->
 		<div data-role="content">
 				<form>
